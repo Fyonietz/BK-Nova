@@ -1,0 +1,27 @@
+1.AUM(Alat Ungkap Masalah)
+2.Kuesioner Sociografik
+3.Inventori Gaya Belajar
+
+
+Actor=1.Admin
+      2.Guru BK
+      3.Wali Murid
+      4.Siswa
+
+Admin=-CRUD User
+      -CRUD Jurusan
+      -CRUD Kelas
+      -Assign BK-Kelas
+
+Guru BK=-Kelola Data Siswa  
+        -Kelola Data AUM
+        -CRUD Kuesioener Sociagrafik
+        -Kelola Data Inventori Gaya Belajar
+
+Wali Murid=-Memantau hasil data AUM
+           -Memantau data kuesioner sociografik
+           -Memantau data inventori gaya belajar
+
+Siswa =-Mengisi AUM
+       -Mengisi kuesioner sociografik
+       -Mengisi inventori gaya belajar
