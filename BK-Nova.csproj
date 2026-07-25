@@ -6,9 +6,17 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>BKNova</RootNamespace>
     <AllowMissingPrunePackageData>true</AllowMissingPrunePackageData>
+    <NoWarn>CS8600;CS8602;CS8618</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
+    <PackageReference Include="Dapper" Version="2.1.79" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />
+    <PackageReference Include="MySql.Data" Version="9.7.0" />
   </ItemGroup>
 
 </Project>
