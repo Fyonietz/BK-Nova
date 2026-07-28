@@ -6,7 +6,7 @@ namespace BKNova.Controllers{
     public static void MapAuth(this WebApplication app){
       var g = app.MapGroup("/api/v1/auth");
 
-      g.MapPost("/register-admin",async (AuthServices services,Register data,IPasswordService pServices)=>{
+      g.MapPost("/register-admin",async (AuthServices services,AdminRegister data,IPasswordService pServices)=>{
         try{
           var Is_Registered = await services.AdminIsRegistered();
           if(Is_Registered == true){
@@ -23,6 +23,29 @@ namespace BKNova.Controllers{
           return Results.InternalServerError(e.Message);
         }
       });
+      g.MapPost("/login",async(AuthServices services,IPasswordService pServices,IJWTService jwtServices,Login login)=>{
+          try{
+            var user = await services.Login(login);
+            if(user is null || !user.Is_Active){
+              return Results.Unauthorized();
+            }
+            if(!pServices.VerifyPassword(login.Password,user.Password)){
+              return Results.Unauthorized();
+            }
+            var token = jwtServices.GenerateToken(user);
+            var refreshToken = jwtServices.GenerateRefreshToken();
+            await services.UpdateRefreshToken(refreshToken,DateTime.UtcNow.AddDays(20),user.Id);           
+            return Results.Ok(new LoginResponse{
+                Token = token,
+                RefreshToken = refreshToken,
+                Nama = user.Nama,
+                Role = user.Role
+            });
+          }catch(Exception e){
+            return Results.InternalServerError(e.Message);
+          }
+      });
+      //TODO : Apply Refresh API
     }
   }
 }
