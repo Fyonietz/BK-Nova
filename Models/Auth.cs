@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authorization;
+
 namespace BKNova.Models
 {
     public class AdminRegister
@@ -29,4 +31,12 @@ namespace BKNova.Models
         public DateTime? RefreshTokenExpired { get; set; }
         public string Role { get; set; }
     }
+   public static class Policies{
+     public const string Admin = "Admin";
+
+     public static void Register(AuthorizationOptions options){
+       options.AddPolicy(Admin,p => p.RequireRole("Admin"));
+
+     }
+   }
 }

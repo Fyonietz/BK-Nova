@@ -1,9 +1,11 @@
 using BKNova.Services;
+using BKNova.Models;
 using BKNova.Controllers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Diagnostics;
+using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 Env.Value = builder.Configuration;
 
@@ -24,13 +26,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
-
-builder.Services.AddAuthorization();
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(
+        new JsonStringEnumConverter());
+});
+builder.Services.AddAuthorization(Policies.Register);
 builder.Services.AddSingleton<IPasswordService,PasswordService>();
 builder.Services.AddScoped<IJWTService,JWTService>();
 
 //CRUD Services Registration
 builder.Services.AddScoped<AuthServices>();
+builder.Services.AddScoped<TahunAjaranServices>();
 var app = builder.Build();
 //Logger
 app.Use(async (context, next) =>
@@ -61,5 +68,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 //CRUD Controller Registration
 app.MapAuth();
+app.MapTahunAjaran();
 app.Run();
 
