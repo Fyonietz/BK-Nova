@@ -53,7 +53,7 @@ namespace BKNova.Services
 
             var sql = @"UPDATE Tahun_Ajaran SET Nama=@Nama,Semester=@Semester,Is_Active=@Is_Active WHERE Id=@Id";
 
-            return await conn.ExecuteAsync(sql, new { Id = Id, Nama = data.Nama, Semester = data.Semester, Is_Active = data.Is_Active}) > 0;
+            return await conn.ExecuteAsync(sql, new { Id = Id, Nama = data.Nama, Semester = data.Semester.ToString(), Is_Active = data.Is_Active}) > 0;
 
         }
 
