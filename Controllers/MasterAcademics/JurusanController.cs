@@ -14,7 +14,7 @@ namespace BKNova.Controllers
                 {
                     if (!await services.Create(data))
                     {
-                        return Results.BadRequest("Failed To Create Tahun Ajaran");
+                        return Results.BadRequest("Failed To Create Jurusan");
                     }
                     
                     return Results.Created();

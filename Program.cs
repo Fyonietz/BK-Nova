@@ -39,6 +39,7 @@ builder.Services.AddScoped<IJWTService,JWTService>();
 builder.Services.AddScoped<AuthServices>();
 builder.Services.AddScoped<TahunAjaranServices>();
 builder.Services.AddScoped<JurusanServices>();
+builder.Services.AddScoped<KelasServices>();
 var app = builder.Build();
 //Logger
 app.Use(async (context, next) =>
@@ -71,5 +72,6 @@ app.UseAuthorization();
 app.MapAuth();
 app.MapTahunAjaran();
 app.MapJurusan();
+app.MapKelas();
 app.Run();
 
