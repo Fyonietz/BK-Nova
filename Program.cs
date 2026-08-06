@@ -53,6 +53,7 @@ builder.Services.AddScoped<KelasServices>();
 
 //Profil And Dynamics
 builder.Services.AddScoped<SiswaServices>();
+builder.Services.AddScoped<WaliKelasServices>();
 
 var app = builder.Build();
 app.UseCors("AllowAndroid");
@@ -89,4 +90,5 @@ app.MapTahunAjaran();
 app.MapJurusan();
 app.MapKelas();                     
 app.MapSiswa();                     
+app.MapWaliKelas();                     
 app.Run();
