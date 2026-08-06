@@ -60,7 +60,7 @@ namespace BKNova.Services
         FROM User u
         JOIN Roles r ON u.Id_Role = r.Id
         WHERE u.Refresh_Token = @refreshToken;";
-          return await conn.QueryFirstOrDefaultAsync<User>(sql,new {refreshToken = req.RefreshToken});
+          return await conn.QueryFirstOrDefaultAsync<User>(sql,new {refreshToken = req.Refresh_Token});
         }
     }
 }

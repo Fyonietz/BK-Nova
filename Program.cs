@@ -8,7 +8,15 @@ using System.Diagnostics;
 using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 Env.Value = builder.Configuration;
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAndroid", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 // Add services to the container.
 builder.Services.AddSingleton<Database>();
 var jwtKey = builder.Configuration["Jwt:Key"]!;
@@ -37,10 +45,17 @@ builder.Services.AddScoped<IJWTService,JWTService>();
 
 //CRUD Services Registration
 builder.Services.AddScoped<AuthServices>();
+
+//Master Academics
 builder.Services.AddScoped<TahunAjaranServices>();
 builder.Services.AddScoped<JurusanServices>();
 builder.Services.AddScoped<KelasServices>();
+
+//Profil And Dynamics
+builder.Services.AddScoped<SiswaServices>();
+
 var app = builder.Build();
+app.UseCors("AllowAndroid");
 //Logger
 app.Use(async (context, next) =>
 {
@@ -72,6 +87,6 @@ app.UseAuthorization();
 app.MapAuth();
 app.MapTahunAjaran();
 app.MapJurusan();
-app.MapKelas();
+app.MapKelas();                     
+app.MapSiswa();                     
 app.Run();
-

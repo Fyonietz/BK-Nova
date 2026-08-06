@@ -17,18 +17,18 @@ namespace BKNova.Models
         public string Token { get; set; } = string.Empty;
         public string Nama { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
-        public string RefreshToken { get; set; } = string.Empty;
+        public string Refresh_Token { get; set; } = string.Empty;
     }
     public class RefreshRequest
     {
-        public string RefreshToken { get; set; } = string.Empty;
+        public string Refresh_Token { get; set; } = string.Empty;
     }
     public class Registered
     {
         public int Id { get; set; }
         public string Nama { get; set; } = string.Empty;
-        public string RefreshToken { get; set; } = string.Empty;
-        public DateTime? RefreshTokenExpired { get; set; }
+        public string Refresh_Token { get; set; } = string.Empty;
+        public DateTime? Refresh_Token_Expired { get; set; }
         public string Role { get; set; }
     }
    public static class Policies{

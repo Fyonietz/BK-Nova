@@ -53,7 +53,7 @@ namespace BKNova.Controllers
                     return Results.Ok(new LoginResponse
                     {
                         Token = token,
-                        RefreshToken = refreshToken,
+                        Refresh_Token = refreshToken,
                         Nama = user.Nama,
                         Role = user.Role
                     });
@@ -79,7 +79,7 @@ namespace BKNova.Controllers
                     return Results.Ok(new LoginResponse
                     {
                         Token = newToken,
-                        RefreshToken = newRefreshToken,
+                        Refresh_Token = newRefreshToken,
                         Nama = user.Nama,
                         Role = user.Role
                     });
