@@ -55,6 +55,8 @@ builder.Services.AddScoped<KelasServices>();
 builder.Services.AddScoped<SiswaServices>();
 builder.Services.AddScoped<WaliKelasServices>();
 
+//AUM
+builder.Services.AddScoped<BidangMasalahServices>();
 var app = builder.Build();
 app.UseCors("AllowAndroid");
 //Logger
@@ -89,6 +91,8 @@ app.MapAuth();
 app.MapTahunAjaran();
 app.MapJurusan();
 app.MapKelas();                     
-app.MapSiswa();                     
-app.MapWaliKelas();                     
+app.MapSiswa();
+
+//AUM
+app.MapBidangMasalah();
 app.Run();

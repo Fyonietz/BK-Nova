@@ -39,7 +39,7 @@ namespace BKNova.Controllers
                     return Results.Problem(title: "Internal Server Error", statusCode: StatusCodes.Status500InternalServerError, detail: e.Message);
                 }
 
-            });
+            }).RequireAuthorization(Policies.Admin);
 
             g.MapGet("/{id}", async (SiswaServices services, int id) =>
             {
@@ -54,7 +54,7 @@ namespace BKNova.Controllers
                     return Results.Problem(title: "Internal Server Error", statusCode: StatusCodes.Status500InternalServerError, detail: e.Message);
                 }
 
-            });
+            }).RequireAuthorization(Policies.Admin);
 
             g.MapPatch("/{id:int}", async (int id, UpdateSiswa data, SiswaServices services, IPasswordService pServices) =>
             {
