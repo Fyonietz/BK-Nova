@@ -7,10 +7,10 @@
       private readonly Database db;
       public BidangMasalahServices(Database _db) => db = _db;
 
-      public async Task<List<BidangMasalahOTD>> GetAll(){
+      public async Task<List<BidangMasalahDTO>> GetAll(){
         using var conn = db.connect();
         string sql = @"SELECT * FROM Bidang_Masalah";
-        var result = await conn.QueryAsync<BidangMasalahOTD>(sql);
+        var result = await conn.QueryAsync<BidangMasalahDTO>(sql);
         return result.ToList();
       }
     }   

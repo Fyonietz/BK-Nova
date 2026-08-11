@@ -17,6 +17,7 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
+builder.Services.AddMemoryCache();
 // Add services to the container.
 builder.Services.AddSingleton<Database>();
 var jwtKey = builder.Configuration["Jwt:Key"]!;
@@ -57,6 +58,7 @@ builder.Services.AddScoped<WaliKelasServices>();
 
 //AUM
 builder.Services.AddScoped<BidangMasalahServices>();
+builder.Services.AddScoped<SoalMasalahServices>();
 var app = builder.Build();
 app.UseCors("AllowAndroid");
 //Logger
@@ -95,4 +97,5 @@ app.MapSiswa();
 
 //AUM
 app.MapBidangMasalah();
+app.MapSoalMasalah();
 app.Run();
