@@ -1,6 +1,9 @@
 using BKNova.Models;
 using BKNova.Services;
-
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 namespace BKNova.Controllers
 {
     public static class AuthController
@@ -89,6 +92,60 @@ namespace BKNova.Controllers
                     return Results.InternalServerError(e.Message);
                 }
             });
+
+
+            g.MapGet("/me", async (
+                AuthServices services,
+                HttpContext httpContext) =>
+            {
+                try
+                {
+                    var userIdClaim =
+                        httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                    {
+                        return Results.Unauthorized();
+                    }
+
+                    var user = await services.GetMe(userId);
+
+                    if (user is null)
+                    {
+                        return Results.NotFound(new
+                        {
+                            message = "User not found"
+                        });
+                    }
+
+                    object? profile = null;
+
+                    switch (user.Role)
+                    {
+                        case "Wali Kelas": // Wali Kelas
+                            profile = await services.GetWaliKelasProfile(user.Id);
+                            break;
+
+                        case "Siswa": // Siswa
+                            profile = await services.GetSiswaProfile(user.Id);
+                            break;
+                    }
+
+                    return Results.Ok(new
+                    {
+                        Id = user.Id,
+                        Nama = user.Nama,
+                        Is_Active = user.Is_Active,
+                        Role = user.Role,
+                        Profile = profile
+                    });
+                }
+                catch (Exception e)
+                {
+                    return Results.InternalServerError(e.Message);
+                }
+            });
+
         }
     }
 }

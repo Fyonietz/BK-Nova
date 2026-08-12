@@ -48,8 +48,9 @@ namespace BKNova.Services
             var sql = @"UPDATE User SET Refresh_Token = @RefreshToken,Refresh_Token_Expired=@Expired WHERE Id=@user_id";
             await conn.ExecuteAsync(sql, new { RefreshToken = RefreshToken, Expired = Expired, user_id = user_id });
         }
-        public async Task<User?> RefreshTokenService(RefreshRequest req){
-          using var conn = db.connect();
+        public async Task<User?> RefreshTokenService(RefreshRequest req)
+        {
+            using var conn = db.connect();
             var sql = @"
         SELECT
             u.Id,
@@ -60,7 +61,73 @@ namespace BKNova.Services
         FROM User u
         JOIN Roles r ON u.Id_Role = r.Id
         WHERE u.Refresh_Token = @refreshToken;";
-          return await conn.QueryFirstOrDefaultAsync<User>(sql,new {refreshToken = req.Refresh_Token});
+            return await conn.QueryFirstOrDefaultAsync<User>(sql, new { refreshToken = req.Refresh_Token });
         }
-    }
-}
+
+        public async Task<User?> GetMe(int userId)
+        {
+            using var conn = db.connect();
+
+            var sql = @"
+              SELECT
+                  u.Id,
+                  u.Nama,
+                  u.Id_Role,
+                  u.Is_Active,
+                  r.Nama AS Role
+              FROM User u
+              JOIN Roles r ON u.Id_Role = r.Id
+              WHERE u.Id = @Id;";
+
+            return await conn.QueryFirstOrDefaultAsync<User>(
+                sql,
+                new { Id = userId }
+            );
+        }
+
+        public async Task<SiswaProfile?> GetSiswaProfile(int userId)
+        {
+            using var conn = db.connect();
+
+            var sql = @"
+                  SELECT
+                  s.Id,
+                  s.Id_User,
+                  s.NISN,
+                  s.NIS,
+                  s.Jenis_Kelamin,
+                  s.Tempat_Tanggal_Lahir,
+                  k.Nama as Kelas,
+                  k.Tingkat as Tingkat,
+                  j.Nama AS Jurusan
+              FROM Siswa s
+              JOIN Kelas k ON k.Id = s.Id_Kelas
+              JOIN Jurusan j on j.Id = k.Id_Jurusan
+              WHERE s.Id_User = @UserId"
+              ;
+
+            return await conn.QueryFirstOrDefaultAsync<SiswaProfile>(
+                sql,
+                new { UserId = userId }
+            );
+        }
+        public async Task<WaliKelasProfile?> GetWaliKelasProfile(int userId)
+        {
+            using var conn = db.connect();
+
+            var sql = @"
+                SELECT
+                    Id,
+                    Id_User,
+                    Id_Kelas,
+                    Id_Tahun_Ajaran
+                FROM Wali_Kelas
+                WHERE Id_User = @UserId;";
+
+            return await conn.QueryFirstOrDefaultAsync<WaliKelasProfile>(
+                sql,
+                new { UserId = userId }
+            );
+        }
+    }//Class
+}//Namespace

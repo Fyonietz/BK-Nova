@@ -41,8 +41,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
         new JsonStringEnumConverter());
 });
 builder.Services.AddAuthorization(Policies.Register);
-builder.Services.AddSingleton<IPasswordService,PasswordService>();
-builder.Services.AddScoped<IJWTService,JWTService>();
+builder.Services.AddSingleton<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IJWTService, JWTService>();
 
 //CRUD Services Registration
 builder.Services.AddScoped<AuthServices>();
@@ -81,8 +81,9 @@ app.Use(async (context, next) =>
 
         var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
+        var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         Console.WriteLine(
-            $"INFO: {ip} - \"{context.Request.Method} {context.Request.Path} {context.Response.StatusCode}\" {sw.ElapsedMilliseconds}ms"
+            $"{timestamp} INFO: {ip} - \"{context.Request.Method} {context.Request.Path} {context.Response.StatusCode}\" {sw.ElapsedMilliseconds}ms"
         );
     }
 });
@@ -92,7 +93,7 @@ app.UseAuthorization();
 app.MapAuth();
 app.MapTahunAjaran();
 app.MapJurusan();
-app.MapKelas();                     
+app.MapKelas();
 app.MapSiswa();
 
 //AUM
