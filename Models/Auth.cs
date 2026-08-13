@@ -58,16 +58,21 @@ namespace BKNova.Models
     {
         public int Id { get; set; }
         public int? Id_User { get; set; }
-        public int? Id_Kelas { get; set; }
-        public int? Id_Tahun_Ajaran { get; set; }
+        public string Kelas { get; set; } = string.Empty;
+        public string TahunAjaran { get; set; } = string.Empty;
+        public string Tingkat {get;set;} = string.Empty;
     }
     public static class Policies
     {
         public const string Admin = "Admin";
+        public const string Siswa = "Siswa";
+        public const string WaliKelas = "Wali Kelas";
 
         public static void Register(AuthorizationOptions options)
         {
             options.AddPolicy(Admin, p => p.RequireRole("Admin"));
+            options.AddPolicy(Siswa, p => p.RequireRole("Siswa"));
+            options.AddPolicy(WaliKelas, p => p.RequireRole("Wali Kelas"));
 
         }
     }

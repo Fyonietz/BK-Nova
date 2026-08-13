@@ -116,13 +116,17 @@ namespace BKNova.Services
             using var conn = db.connect();
 
             var sql = @"
-                SELECT
-                    Id,
-                    Id_User,
-                    Id_Kelas,
-                    Id_Tahun_Ajaran
-                FROM Wali_Kelas
-                WHERE Id_User = @UserId;";
+                    SELECT
+                    w.Id,
+                    w.Id_User,
+                    k.Nama AS Kelas,
+                    k.Tingkat AS Tingkat,
+                    t.Nama AS TahunAjaran
+                    
+                FROM Wali_Kelas w
+                JOIN Kelas k ON w.Id_Kelas = k.Id
+                JOIN Tahun_Ajaran t on w.Id_Kelas = t.Id
+                WHERE w.Id_User = @UserId";
 
             return await conn.QueryFirstOrDefaultAsync<WaliKelasProfile>(
                 sql,
