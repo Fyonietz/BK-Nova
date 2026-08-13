@@ -69,7 +69,7 @@ namespace BKNova.Models
         public int Id { get; set; }
         public string Nama { get; set; } = string.Empty;
         public string Kelas { get; set; } = string.Empty;
-        public string Tahun_Ajaran { get; set; } =string.Empty;
+        public string Tahun_Ajaran { get; set; } = string.Empty;
         public DateTime Created_At { get; set; } = DateTime.UtcNow;
         public string Refresh_Token { get; set; } = string.Empty;
         public DateTime? Refresh_Token_Expired { get; set; }
@@ -78,20 +78,33 @@ namespace BKNova.Models
 
     public class RiwayatKelasSiswa
     {
-        public int Id_Siswa { get; set; }
+        public int Id_User { get; set; }
         public int Id_Kelas { get; set; }
         public int Id_Tahun_Ajaran { get; set; }
         public bool Is_Active { get; set; } = true;
     }
 
+    public class UpdateRiwayatKelasSiswa
+    {
+        public int Id_Kelas { get; set; }
+        public int Id_Tahun_Ajaran { get; set; }
+        public bool Is_Active { get; set; }
+    }
+
     public class RiwayatKelasSiswaDTO
     {
         public int Id { get; set; }
-        public int Id_Siswa { get; set; }
+        public int Id_User { get; set; }
         public string Nama_Siswa { get; set; } = string.Empty;
         public int Id_Kelas { get; set; }
         public string Nama_Kelas { get; set; } = string.Empty;
         public int Id_Tahun_Ajaran { get; set; }
         public bool Is_Active { get; set; }
+    }
+
+    public class PromoteKelas
+    {
+        public int Id_Kelas_Lama { get; set; }
+        public int Id_Tahun_Ajaran_Baru { get; set; }
     }
 }//Namespace

@@ -55,6 +55,7 @@ builder.Services.AddScoped<KelasServices>();
 //Profil And Dynamics
 builder.Services.AddScoped<SiswaServices>();
 builder.Services.AddScoped<WaliKelasServices>();
+builder.Services.AddScoped<RiwayatKelasSiswaServices>();
 
 //AUM
 builder.Services.AddScoped<BidangMasalahServices>();
@@ -94,11 +95,15 @@ app.UseAuthorization();
 app.MapAuth();
 app.MapTahunAjaran();
 app.MapJurusan();
+
+//Profil
 app.MapKelas();
 app.MapSiswa();
+app.MapRiwayatKelasSiswa();
 
 //AUM
 app.MapBidangMasalah();
 app.MapSoalMasalah();
 app.MapAum();
+
 app.Run();
