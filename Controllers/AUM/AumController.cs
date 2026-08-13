@@ -14,6 +14,7 @@ namespace BKNova.Controllers
                try
                {
                    var ok = await services.SubmitAUM(data);
+
                    if (!ok) return Results.BadRequest(new { message = "Sudah submit atau siswa tidak ditemukan" });
                    return Results.Ok(new { message = "AUM berhasil disubmit" });
                }
@@ -22,9 +23,19 @@ namespace BKNova.Controllers
                    return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message);
                }
            }).RequireAuthorization(Policies.Siswa);
-            g.MapGet("/status/{idUser:int}/{idTahunAjaran:int}", async (AumServices services, int idUser, int idTahunAjaran) =>
+            g.MapGet("/hasil/{idSiswa:int}", async (AumServices services, int idSiswa) =>
+            {
+                try
+                {
+                    var res = await services.GetHasilBySiswa(idSiswa);
+                    if (res == null) return Results.NotFound(new { message = "Belum ada hasil AUM" });
+                    return Results.Ok(res);
+                }
+                catch (Exception e) { return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message); }
+            });
+            g.MapGet("/status/{idUser:int}", async (AumServices services, int idUser) =>
            {
-               try { return Results.Ok(new { submitted = await services.HasSubmitted(idUser, idTahunAjaran) }); }
+               try { return Results.Ok(new { submitted = await services.HasSubmitted(idUser) }); }
                catch (Exception e) { return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message); }
            });
         }

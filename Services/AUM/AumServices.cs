@@ -68,14 +68,64 @@ namespace BKNova.Services
             }
         }
 
-        public async Task<bool> HasSubmitted(int idUser, int idTahunAjaran)
+        public async Task<bool> HasSubmitted(int idUser)
         {
             using var conn = db.connect();
             string sql = @"SELECT COUNT(1) FROM Status_Submit_AUM ss
                     JOIN Siswa s ON s.Id = ss.Id_Siswa
-                    WHERE s.Id_User = @idUser AND ss.Id_Tahun_Ajaran = @idTahunAjaran";
-            var count = await conn.ExecuteScalarAsync<int>(sql, new { idUser, idTahunAjaran });
+                    WHERE s.Id_User = @idUser";
+            var count = await conn.ExecuteScalarAsync<int>(sql, new { idUser });
             return count > 0;
+        }
+
+        public async Task<HasilAUMGrouped?> GetHasilBySiswa(int idSiswa)
+        {
+            using var conn = db.connect();
+            string sql = @"
+                  SELECT 
+                    h.Id AS Id,
+                    s.Id AS IdSiswa,
+                    h.Creted_At AS WaktuMengisi,
+                    s.NIS,
+                    s.NISN,
+                    u.Nama AS Nama,
+                    k.Nama AS Kelas,
+                    k.Tingkat AS Tingkat,
+                    b.Kode AS Kode_Bidang,
+                    b.Nama AS Nama_Bidang,
+                    sm.Pertanyaan AS Pilihan
+                  FROM Hasil_AUM h
+                  JOIN Siswa s ON s.Id = h.Id_Siswa
+                  JOIN User u ON u.Id = s.Id_User
+                  JOIN Kelas k ON k.Id = s.Id_Kelas
+                  JOIN Soal_Masalah sm ON sm.Id = h.Id_Soal_Masalah
+                  JOIN Bidang_Masalah b ON b.Id = sm.Id_Bidang_Masalah
+                  WHERE s.Id = @idSiswa";
+
+            var rows = (await conn.QueryAsync<HasilAUMFlat>(sql, new { idSiswa })).ToList();
+            if (rows.Count == 0) return null;
+
+            var grouped = new HasilAUMGrouped
+            {
+                IdSiswa = rows[0].IdSiswa,
+                Nama = rows[0].Nama,
+                Kelas = rows[0].Kelas,
+                Tingkat = rows[0].Tingkat,
+                NIS = rows[0].NIS,
+                NISN = rows[0].NISN,
+                WaktuMengisi = rows[0].WaktuMengisi,
+                Bidang = rows
+                    .GroupBy(r => new { r.Kode_Bidang, r.Nama_Bidang })
+                    .Select(g => new BidangGrouped
+                    {
+                        Kode_Bidang = g.Key.Kode_Bidang,
+                        Nama_Bidang = g.Key.Nama_Bidang,
+                        Pilihan = g.Select(x => x.Pilihan).ToList()
+                    })
+                    .ToList()
+            };
+
+            return grouped;
         }
     }//Class
 }//Namespace
