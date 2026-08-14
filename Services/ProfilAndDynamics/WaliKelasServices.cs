@@ -61,6 +61,7 @@ namespace BKNova.Services
               u.Created_At,
               u.Id as Id,
               k.Nama as Kelas,
+              k.Tingkat as Tingkat,
               t.Nama AS Tahun_Ajaran
               FROM Wali_Kelas w
               JOIN User u ON u.Id = w.Id_User
@@ -103,6 +104,7 @@ namespace BKNova.Services
                 Password = COALESCE(@Password, Password), 
                 Updated_At = @Updated_At 
             WHERE Id = @Id;";
+
 
                 int user_status = await conn.ExecuteAsync(sql_user, new
                 {

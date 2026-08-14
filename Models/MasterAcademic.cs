@@ -32,6 +32,7 @@ namespace BKNova.Models
       public int Id {get;set;}
       public string Nama {get;set;} = string.Empty;
       public string Jurusan {get;set;} = string.Empty;
+      public string Tingkat {get;set;} = string.Empty;
     }
 
 }

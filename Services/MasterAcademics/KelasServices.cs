@@ -24,7 +24,7 @@ namespace BKNova.Services
         {
             using var conn = db.connect();
 
-            var sql = @"SELECT k.Id,k.Nama,j.Nama as Jurusan FROM Kelas k JOIN Jurusan j ON k.Id_Jurusan=j.Id";
+            var sql = @"SELECT k.Id,k.Nama,k.Tingkat,j.Nama as Jurusan FROM Kelas k JOIN Jurusan j ON k.Id_Jurusan=j.Id";
 
             var result = await conn.QueryAsync<KelasDTO>(sql);
             return result.ToList();

@@ -85,7 +85,8 @@ namespace BKNova.Services
               u.Refresh_Token_Expired,
               u.Created_At,
               u.Id as Id,
-              k.Nama as Kelas
+              k.Nama as Kelas,
+              k.Tingkat as Tingkat
               FROM Siswa s 
               JOIN User u ON u.id = s.Id_User
               JOIN Kelas k ON k.Id = s.Id_Kelas";

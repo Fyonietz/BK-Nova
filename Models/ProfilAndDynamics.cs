@@ -38,6 +38,7 @@ namespace BKNova.Models
         public int Id { get; set; }
         public string Nama { get; set; } = string.Empty;
         public string Kelas { get; set; } = string.Empty;
+        public string Tingkat { get; set; } = string.Empty;
         public string NISN { get; set; } = string.Empty;
         public string NIS { get; set; } = string.Empty;
         public string Kelamin { get; set; } = string.Empty;
@@ -69,6 +70,7 @@ namespace BKNova.Models
         public int Id { get; set; }
         public string Nama { get; set; } = string.Empty;
         public string Kelas { get; set; } = string.Empty;
+        public string Tingkat { get; set; } = string.Empty;
         public string Tahun_Ajaran { get; set; } = string.Empty;
         public DateTime Created_At { get; set; } = DateTime.UtcNow;
         public string Refresh_Token { get; set; } = string.Empty;

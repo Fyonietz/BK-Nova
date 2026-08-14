@@ -23,11 +23,11 @@ namespace BKNova.Controllers
                    return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message);
                }
            }).RequireAuthorization(Policies.Siswa);
-            g.MapGet("/hasil/{idSiswa:int}", async (AumServices services, int idSiswa) =>
+            g.MapGet("/hasil/{idGuru:int}", async (AumServices services, int idGuru) =>
             {
                 try
                 {
-                    var res = await services.GetHasilBySiswa(idSiswa);
+                    var res = await services.GetHasilByBK(idGuru);
                     if (res == null) return Results.NotFound(new { message = "Belum ada hasil AUM" });
                     return Results.Ok(res);
                 }
