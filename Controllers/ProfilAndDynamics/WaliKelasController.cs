@@ -36,10 +36,11 @@ namespace BKNova.Controllers
                 catch (Exception e) { return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message); }
             });
 
-            g.MapPatch("/{id:int}", async (int id, UpdateWaliKelas data, WaliKelasServices services) =>
+            g.MapPatch("/{id:int}", async (int id, UpdateWaliKelas data, WaliKelasServices services,IPasswordService pServices) =>
             {
                 try
-                {
+                { 
+                    data.Password = pServices.HashPassword(data.Password);
                     var updated = await services.Update(id, data);
                     if (!updated) return Results.NotFound(new { message = $"Wali_Kelas with ID {id} not found or not updated." });
                     return Results.Ok(new { message = "Wali_Kelas updated successfully" });
