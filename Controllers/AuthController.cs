@@ -146,6 +146,24 @@ namespace BKNova.Controllers
                 }
             });
 
+            g.MapPatch("/change-password", async (AuthServices services, ChangePassword data, IPasswordService pServices, ClaimsPrincipal user) =>
+            {
+                try
+                {
+                    var userId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+                    var ok = await services.ChangePassword(userId, data, pServices);
+                    if (!ok)
+                        return Results.BadRequest(new { message = "Password lama salah atau user tidak ditemukan" });
+
+                    return Results.Ok(new { message = "Password berhasil diubah" });
+                }
+                catch (Exception e)
+                {
+                    return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message);
+                }
+            }).RequireAuthorization();
+
         }
     }
 }

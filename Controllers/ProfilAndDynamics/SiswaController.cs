@@ -65,7 +65,7 @@ namespace BKNova.Controllers
                     {
                         data.Password = pServices.HashPassword(data.Password);
                     }
-  
+
                     // 2. Perform the update
                     var updated = await services.Update(id, data);
 
@@ -93,26 +93,40 @@ namespace BKNova.Controllers
                 }
             }).RequireAuthorization(Policies.Admin);
 
-            g.MapDelete("/{id}",async(SiswaServices services,int id)=>{
-              try
-              {
-                var rest = await services.Delete(id);
-                if(!rest){
-                  return Results.BadRequest();
+            g.MapDelete("/{id}", async (SiswaServices services, int id) =>
+            {
+                try
+                {
+                    var rest = await services.Delete(id);
+                    if (!rest)
+                    {
+                        return Results.BadRequest();
+                    }
+                    return Results.Ok();
                 }
-                return Results.Ok();
-              }
-              catch (Exception e)
-              {
-                  
+                catch (Exception e)
+                {
+
                     return Results.Problem(
                         title: "Internal Server Error",
                         statusCode: StatusCodes.Status500InternalServerError,
                         detail: e.Message
                     );
 
-              }
+                }
             }).RequireAuthorization(Policies.Admin);
+            g.MapPost("/import", async (SiswaServices services, ImportSiswaRequest data, IPasswordService pServices) =>
+           {
+               try
+               {
+                   var result = await services.ImportCsv(data, pServices);
+                   return Results.Ok(result);
+               }
+               catch (Exception e)
+               {
+                   return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message);
+               }
+           }).RequireAuthorization(Policies.Admin);
         }
     }
 }

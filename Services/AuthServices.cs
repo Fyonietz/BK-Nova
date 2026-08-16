@@ -133,5 +133,32 @@ namespace BKNova.Services
                 new { UserId = userId }
             );
         }
+        public async Task<bool> ChangePassword(int userId, ChangePassword data, IPasswordService pServices)
+        {
+            using var conn = db.connect();
+
+            // 1. Ambil password hash yang tersimpan
+            var currentHash = await conn.ExecuteScalarAsync<string?>(
+                "SELECT Password FROM User WHERE Id = @Id", new { Id = userId });
+
+            if (currentHash == null)
+                return false; // user tidak ditemukan
+
+            // 2. Verifikasi password lama
+            if (!pServices.VerifyPassword(data.Old_Password, currentHash))
+                return false; // password lama salah
+
+            // 3. Hash & update password baru
+            var newHash = pServices.HashPassword(data.New_Password);
+            string sql = @"UPDATE User SET Password = @NewHash, Updated_At = @Updated_At WHERE Id = @Id";
+            int affected = await conn.ExecuteAsync(sql, new
+            {
+                NewHash = newHash,
+                Updated_At = DateTime.UtcNow,
+                Id = userId
+            });
+
+            return affected > 0;
+        }
     }//Class
 }//Namespace

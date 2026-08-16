@@ -50,9 +50,9 @@ namespace BKNova.Models
         public string? NIS { get; set; }
         public string Jenis_Kelamin { get; set; } = "";
         public string Tempat_Tanggal_Lahir { get; set; } = "";
-        public string Kelas {get;set;} = string.Empty;
-        public string Tingkat {get;set;} = string.Empty;
-        public string Jurusan {get;set;} = string.Empty;
+        public string Kelas { get; set; } = string.Empty;
+        public string Tingkat { get; set; } = string.Empty;
+        public string Jurusan { get; set; } = string.Empty;
     }
     public class WaliKelasProfile
     {
@@ -60,7 +60,12 @@ namespace BKNova.Models
         public int? Id_User { get; set; }
         public string Kelas { get; set; } = string.Empty;
         public string TahunAjaran { get; set; } = string.Empty;
-        public string Tingkat {get;set;} = string.Empty;
+        public string Tingkat { get; set; } = string.Empty;
+    }
+    public class ChangePassword
+    {
+        public string Old_Password { get; set; } = string.Empty;
+        public string New_Password { get; set; } = string.Empty;
     }
     public static class Policies
     {

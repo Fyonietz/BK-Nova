@@ -182,37 +182,98 @@ namespace BKNova.Services
             }
         }
 
-        public async Task<bool> Delete(int id){
-          using var conn = db.connect();
-          await conn.OpenAsync();
-          using(var transaction=conn.BeginTransaction()){
-            try{
-               string sql_siswa = @"DELETE FROM Siswa WHERE Id_User=@Id";
-               int siswa_status = await conn.ExecuteAsync(sql_siswa,new {Id = id},transaction);
+        public async Task<bool> Delete(int id)
+        {
+            using var conn = db.connect();
+            await conn.OpenAsync();
+            using (var transaction = conn.BeginTransaction())
+            {
+                try
+                {
+                    string sql_siswa = @"DELETE FROM Siswa WHERE Id_User=@Id";
+                    int siswa_status = await conn.ExecuteAsync(sql_siswa, new { Id = id }, transaction);
 
-               string sql_user = @"DELETE FROM User WHERE Id=@Id";
-               int user_status = await conn.ExecuteAsync(sql_user,new {Id = id},transaction);
+                    string sql_user = @"DELETE FROM User WHERE Id=@Id";
+                    int user_status = await conn.ExecuteAsync(sql_user, new { Id = id }, transaction);
 
-               if(siswa_status > 0 && user_status > 0){
-                 await transaction.CommitAsync();
-                 return true;
-               }
+                    if (siswa_status > 0 && user_status > 0)
+                    {
+                        await transaction.CommitAsync();
+                        return true;
+                    }
 
-               await transaction.RollbackAsync();
-               return false;
-            }catch(Exception ex){
-              Console.WriteLine($"Update Error: {ex.Message}");
-              await transaction.RollbackAsync();
-              return false;
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Update Error: {ex.Message}");
+                    await transaction.RollbackAsync();
+                    return false;
+
+                }
 
             }
-
-          }
         }
 
 
 
+        public async Task<ImportSiswaResult> ImportCsv(ImportSiswaRequest data, IPasswordService pServices)
+        {
+            var result = new ImportSiswaResult { Total = data.Data.Count };
+            var hashedPassword = pServices.HashPassword(data.Password); // hash sekali aja
 
+            foreach (var row in data.Data)
+            {
+                using var conn = db.connect();
+                await conn.OpenAsync();
+                using var transaction = await conn.BeginTransactionAsync();
+                try
+                {
+                    var JenisKelaminConverted = row.Kelamin switch
+                    {
+                        JenisKelamin.Laki => "Laki-Laki",
+                        JenisKelamin.Perempuan => "Perempuan",
+                        _ => throw new ArgumentException("Invalid gender value")
+                    };
+
+                    var sql_user = @"INSERT INTO User(Nama, Password, Id_Role, Is_Active) 
+                             VALUES(@Nama, @Password, @Id_Role, @Is_Active)";
+                    await conn.ExecuteAsync(sql_user, new
+                    {
+                        Nama = row.Nama,
+                        Password = hashedPassword,
+                        Id_Role = 4,
+                        Is_Active = true
+                    }, transaction);
+
+                    var userId = await conn.ExecuteScalarAsync<ulong>(
+                        "SELECT LAST_INSERT_ID()", transaction: transaction);
+
+                    var sql_siswa = @"INSERT INTO Siswa(Id_User, NISN, NIS, Jenis_Kelamin, Tempat_Tanggal_Lahir, Id_Kelas) 
+                              VALUES(@Id_User, @NISN, @NIS, @Jenis_Kelamin, @TempatLahir, @Id_Kelas)";
+                    await conn.ExecuteAsync(sql_siswa, new
+                    {
+                        Id_User = (int)userId,
+                        NISN = row.NISN,
+                        NIS = row.NIS,
+                        Id_Kelas = data.Id_Kelas,
+                        Jenis_Kelamin = JenisKelaminConverted,
+                        TempatLahir = row.Tempat_Tanggal_Lahir
+                    }, transaction);
+
+                    await transaction.CommitAsync();
+                    result.Success++;
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    result.Failed.Add(new ImportSiswaFailed { Nama = row.Nama, Reason = ex.Message });
+                }
+            }
+
+            return result;
+        }
 
 
 

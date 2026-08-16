@@ -47,6 +47,33 @@ namespace BKNova.Models
         public string Refresh_Token { get; set; } = string.Empty;
         public DateTime? Refresh_Token_Expired { get; set; }
     }
+    public class ImportSiswaRow
+    {
+        public string Nama { get; set; } = string.Empty;
+        public string NISN { get; set; } = string.Empty;
+        public string NIS { get; set; } = string.Empty;
+        public JenisKelamin Kelamin { get; set; }
+        public string Tempat_Tanggal_Lahir { get; set; } = string.Empty;
+    }
+
+    public class ImportSiswaRequest
+    {
+        public int Id_Kelas { get; set; }
+        public string Password { get; set; } = string.Empty;
+        public List<ImportSiswaRow> Data { get; set; } = new();
+    }
+    public class ImportSiswaFailed
+    {
+        public string Nama { get; set; } = string.Empty;
+        public string Reason { get; set; } = string.Empty;
+    }
+
+    public class ImportSiswaResult
+    {
+        public int Total { get; set; }
+        public int Success { get; set; }
+        public List<ImportSiswaFailed> Failed { get; set; } = new();
+    }
     public class WaliKelas
     {
         public int Id_Kelas { get; set; }
