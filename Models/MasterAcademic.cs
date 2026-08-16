@@ -26,6 +26,7 @@ namespace BKNova.Models
     }
     public class Kelas{
       public string Nama {get;set;} = string.Empty;
+      public string Tingkat {get;set;} = string.Empty;
       public int Id_Jurusan {get;set;}
     }
     public class KelasDTO{

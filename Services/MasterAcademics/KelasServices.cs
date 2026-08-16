@@ -13,10 +13,10 @@ namespace BKNova.Services
             using var conn = db.connect();
 
             var sql = @"
-        INSERT INTO Kelas (Nama,Id_Jurusan)
-        VALUES (@Nama, @Id_Jurusan)";
+        INSERT INTO Kelas (Nama,Id_Jurusan,Tingkat)
+        VALUES (@Nama, @Id_Jurusan,@Tingkat)";
 
-            var rows = await conn.ExecuteAsync(sql, new { Nama = data.Nama,Id_Jurusan=data.Id_Jurusan});
+            var rows = await conn.ExecuteAsync(sql, new { Nama = data.Nama,Id_Jurusan=data.Id_Jurusan,Tingkat = data.Tingkat});
 
             return rows > 0;
         }

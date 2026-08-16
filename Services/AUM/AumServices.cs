@@ -78,16 +78,13 @@ namespace BKNova.Services
             return count > 0;
         }
 
-        // Ambil daftar Id_Kelas yang jadi tanggung jawab guru BK ini
         private async Task<List<int>> GetKelasTugasBK(int idUserGuru)
         {
             using var conn = db.connect();
-
             string sql = @"
-        SELECT tb.Id_Kelas 
-        FROM Tugas_BK tb
-        JOIN BK b ON b.Id = tb.Id_BK
-        WHERE b.Id_User = @idUserGuru AND tb.Is_Active = 1";
+        SELECT Id_Kelas 
+        FROM Tugas_BK
+        WHERE Id_User_BK = @idUserGuru AND Is_Active = 1";
 
             var result = await conn.QueryAsync<int>(sql, new { idUserGuru });
             return result.ToList();
@@ -104,6 +101,9 @@ namespace BKNova.Services
         SELECT 
           h.Id AS Id,
           s.Id AS IdSiswa,
+          s.NIS AS NIS,
+          s.NISN AS NISN,
+          h.Creted_At as WaktuMengisi,
           u.Nama AS Nama,
           k.Nama AS Kelas,
           k.Tingkat AS Tingkat,
@@ -128,6 +128,9 @@ namespace BKNova.Services
                     Nama = g.First().Nama,
                     Kelas = g.First().Kelas,
                     Tingkat = g.First().Tingkat,
+                    NISN = g.First().NISN,
+                    NIS = g.First().NIS,
+                    WaktuMengisi = g.First().WaktuMengisi,
                     Bidang = g.GroupBy(x => new { x.Kode_Bidang, x.Nama_Bidang })
                               .Select(bg => new BidangGrouped
                               {

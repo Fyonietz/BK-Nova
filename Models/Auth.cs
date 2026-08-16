@@ -72,12 +72,14 @@ namespace BKNova.Models
         public const string Admin = "Admin";
         public const string Siswa = "Siswa";
         public const string WaliKelas = "Wali Kelas";
+        public const string BK = "Guru BK";
 
         public static void Register(AuthorizationOptions options)
         {
             options.AddPolicy(Admin, p => p.RequireRole("Admin"));
             options.AddPolicy(Siswa, p => p.RequireRole("Siswa"));
             options.AddPolicy(WaliKelas, p => p.RequireRole("Wali Kelas"));
+            options.AddPolicy(BK, p => p.RequireRole("Guru BK"));
 
         }
     }

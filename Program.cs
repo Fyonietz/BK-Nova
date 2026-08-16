@@ -7,48 +7,47 @@ using System.Text;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
 
+// Namespace ini akan valid karena kita menggunakan Swashbuckle
+using Microsoft.OpenApi.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 Env.Value = builder.Configuration;
 
-// 1. Updated CORS Configuration
+// ─────────────────────────────────────────────
+// 1. CORS CONFIGURATION
+// ─────────────────────────────────────────────
 builder.Services.AddCors(options =>
 {
-    // Android or mobile clients that don't pass an Origin header
     options.AddPolicy("AllowAndroid", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
     });
 
-    // Web Frontend policy (Update origin URL to match your frontend server)
     options.AddPolicy("AllowWebFrontend", policy =>
     {
         policy.WithOrigins(
-                    "http://localhost:3000",   // React / Next.js default
-                    "http://localhost:5173",   // Vite default
-                    "http://localhost:4200",   // Angular default
-                    "https://yourdomain.com"   // Production frontend URL
+                    "http://localhost:3000",   
+                    "http://localhost:5173",   
+                    "http://localhost:4200",   
+                    "https://yourdomain.com"   
               )
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials(); // Required if you pass cookies or Authorization headers with credentials
+              .AllowCredentials(); 
     });
 
-    // Alternative: Single policy for both Android and Web (Permissive)
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
     });
 });
 
 builder.Services.AddMemoryCache();
-
-// Add services to the container.
 builder.Services.AddSingleton<Database>();
 
+// ─────────────────────────────────────────────
+// 2. AUTHENTICATION (JWT)
+// ─────────────────────────────────────────────
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -67,46 +66,85 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
-    options.SerializerOptions.Converters.Add(
-        new JsonStringEnumConverter());
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
+// ─────────────────────────────────────────────
+// 3. SWAGGER CONFIGURATION
+// ─────────────────────────────────────────────
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo 
+    { 
+        Title = "BKNova API", 
+        Version = "v1",
+        Description = "Dokumentasi API BKNova"
+    });
+
+    // Menambahkan input Token JWT di Swagger UI
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "Masukkan JWT Token dengan format: Bearer {token}",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+// ─────────────────────────────────────────────
+// 4. SERVICES REGISTRATION
+// ─────────────────────────────────────────────
 builder.Services.AddAuthorization(Policies.Register);
 builder.Services.AddSingleton<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IJWTService, JWTService>();
 
-// CRUD Services Registration
 builder.Services.AddScoped<AuthServices>();
-
-// Master Academics
 builder.Services.AddScoped<TahunAjaranServices>();
 builder.Services.AddScoped<JurusanServices>();
 builder.Services.AddScoped<KelasServices>();
-
-// Profil And Dynamics
 builder.Services.AddScoped<SiswaServices>();
 builder.Services.AddScoped<WaliKelasServices>();
 builder.Services.AddScoped<RiwayatKelasSiswaServices>();
-
-// AUM
 builder.Services.AddScoped<BidangMasalahServices>();
 builder.Services.AddScoped<SoalMasalahServices>();
 builder.Services.AddScoped<AumServices>();
-
-// BK
 builder.Services.AddScoped<BKServices>();
 
 var app = builder.Build();
 
-// 2. Correct Middleware Pipeline Order
-// app.UseCors MUST be called before app.UseAuthentication() and app.UseAuthorization()
-app.UseCors("AllowWebFrontend"); // Or use "AllowAll" / "AllowAndroid"
+// ─────────────────────────────────────────────
+// 5. MIDDLEWARE PIPELINE
+// ─────────────────────────────────────────────
+    // Mengaktifkan UI Swagger
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "BKNova API v1");
+    });
+
+app.UseCors("AllowWebFrontend");
 
 // Logger
 app.Use(async (context, next) =>
 {
     var sw = Stopwatch.StartNew();
-
     try
     {
         await next();
@@ -119,36 +157,28 @@ app.Use(async (context, next) =>
     finally
     {
         sw.Stop();
-
         var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-
         var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        Console.WriteLine(
-            $"{timestamp} INFO: {ip} - \"{context.Request.Method} {context.Request.Path} {context.Response.StatusCode}\" {sw.ElapsedMilliseconds}ms"
-        );
+        Console.WriteLine($"{timestamp} INFO: {ip} - \"{context.Request.Method} {context.Request.Path} {context.Response.StatusCode}\" {sw.ElapsedMilliseconds}ms");
     }
 });
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-// CRUD Controller Registration
+// ─────────────────────────────────────────────
+// 6. ENDPOINT MAPPING
+// ─────────────────────────────────────────────
 app.MapAuth();
 app.MapTahunAjaran();
 app.MapJurusan();
-
-// Profil
 app.MapKelas();
 app.MapSiswa();
 app.MapWaliKelas();
 app.MapRiwayatKelasSiswa();
-
-// AUM
 app.MapBidangMasalah();
 app.MapSoalMasalah();
 app.MapAum();
-
-// BK
 app.MapBK();
 
 app.Run();
