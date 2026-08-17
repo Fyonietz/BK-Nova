@@ -72,6 +72,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 // ─────────────────────────────────────────────
 // 3. SWAGGER CONFIGURATION
 // ─────────────────────────────────────────────
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -82,14 +83,15 @@ builder.Services.AddSwaggerGen(c =>
         Description = "Dokumentasi API BKNova"
     });
 
-    // Menambahkan input Token JWT di Swagger UI
+    // UBAH BAGIAN INI: Gunakan Type = Http
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "Masukkan JWT Token dengan format: Bearer {token}",
+        Description = "Masukkan JWT Token saja. Swagger akan otomatis menambahkan kata 'Bearer ' di depannya.",
         Name = "Authorization",
         In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Type = SecuritySchemeType.Http, // <-- Diubah dari ApiKey ke Http
+        Scheme = "Bearer",              // <-- Wajib lowercase atau PascalCase "Bearer"
+        BearerFormat = "JWT"
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement

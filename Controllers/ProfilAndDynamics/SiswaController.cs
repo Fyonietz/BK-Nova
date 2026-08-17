@@ -41,6 +41,20 @@ namespace BKNova.Controllers
 
             }).RequireAuthorization(Policies.Admin);
 
+            g.MapGet("/kelas/{id}", async (SiswaServices services,int id) =>
+            {
+
+                try
+                {
+                    var services_data = await services.GetByKelas(id);
+                    return Results.Ok(services_data);
+                }
+                catch (Exception e)
+                {
+                    return Results.Problem(title: "Internal Server Error", statusCode: StatusCodes.Status500InternalServerError, detail: e.Message);
+                }
+
+            }).RequireAuthorization(Policies.BK);
             g.MapGet("/{id}", async (SiswaServices services, int id) =>
             {
 

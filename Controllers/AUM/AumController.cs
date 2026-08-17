@@ -33,6 +33,17 @@ namespace BKNova.Controllers
                 }
                 catch (Exception e) { return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message); }
             });
+
+            g.MapGet("/hasil/{idGuru:int}/{idSiswa}", async (AumServices services, int idGuru,int idSiswa) =>
+            {
+                try
+                {
+                    var res = await services.GetHasilSiswaByBK(idGuru,idSiswa);
+                    if (res == null) return Results.NotFound(new { message = "Belum ada hasil AUM" });
+                    return Results.Ok(res);
+                }
+                catch (Exception e) { return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message); }
+            }).RequireAuthorization(Policies.BK);
             g.MapGet("/status/{idUser:int}", async (AumServices services, int idUser) =>
            {
                try { return Results.Ok(new { submitted = await services.HasSubmitted(idUser) }); }

@@ -93,6 +93,28 @@ namespace BKNova.Services
             var result = await conn.QueryAsync<SiswaDTO>(sql);
             return result.ToList();
         }
+
+        public async Task<List<SiswaDTO>> GetByKelas(int Id)
+        {
+            using var conn = db.connect();
+            string sql = @"SELECT 
+              s.NIS,
+              s.NISN,
+              s.Jenis_Kelamin AS Kelamin,
+              s.Tempat_Tanggal_Lahir,
+              u.Nama as Nama,
+              u.Refresh_Token,
+              u.Refresh_Token_Expired,
+              u.Created_At,
+              u.Id as Id,
+              k.Nama as Kelas,
+              k.Tingkat as Tingkat
+              FROM Siswa s 
+              JOIN User u ON u.id = s.Id_User
+              JOIN Kelas k ON k.Id = s.Id_Kelas WHERE k.Id = @Id";
+            var result = await conn.QueryAsync<SiswaDTO>(sql,new {Id = Id});
+            return result.ToList();
+        }
         public async Task<SiswaDTO> GetById(int Id)
         {
             using var conn = db.connect();

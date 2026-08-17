@@ -140,5 +140,59 @@ namespace BKNova.Services
                               }).ToList()
                 }).ToList();
         }
+
+        // Ambil hasil AUM untuk 1 siswa spesifik yang berada di bawah pengampuan Guru BK
+        public async Task<HasilAUMGrouped?> GetHasilSiswaByBK(int idUserGuru, int idSiswa)
+        {
+            var kelasIds = await GetKelasTugasBK(idUserGuru);
+            if (kelasIds.Count == 0) return null;
+
+            using var conn = db.connect();
+            string sql = @"
+        SELECT 
+            h.Id AS Id,
+            s.Id AS IdSiswa,
+            s.NIS AS NIS,
+            s.NISN AS NISN,
+            h.Creted_At as WaktuMengisi,
+            u.Nama AS Nama,
+            k.Nama AS Kelas,
+            k.Tingkat AS Tingkat,
+            b.Kode AS Kode_Bidang,
+            b.Nama AS Nama_Bidang,
+            sm.Pertanyaan AS Pilihan
+        FROM Hasil_AUM h
+        JOIN Siswa s ON s.Id = h.Id_Siswa
+        JOIN User u ON u.Id = s.Id_User
+        JOIN Kelas k ON k.Id = s.Id_Kelas
+        JOIN Soal_Masalah sm ON sm.Id = h.Id_Soal_Masalah
+        JOIN Bidang_Masalah b ON b.Id = sm.Id_Bidang_Masalah
+        WHERE s.Id = @idSiswa 
+          AND s.Id_Kelas IN @kelasIds";
+
+            var rows = (await conn.QueryAsync<HasilAUMFlat>(sql, new { idSiswa, kelasIds })).ToList();
+
+            if (!rows.Any()) return null;
+
+            return rows
+                .GroupBy(r => r.IdSiswa)
+                .Select(g => new HasilAUMGrouped
+                {
+                    IdSiswa = g.Key,
+                    Nama = g.First().Nama,
+                    Kelas = g.First().Kelas,
+                    Tingkat = g.First().Tingkat,
+                    NISN = g.First().NISN,
+                    NIS = g.First().NIS,
+                    WaktuMengisi = g.First().WaktuMengisi,
+                    Bidang = g.GroupBy(x => new { x.Kode_Bidang, x.Nama_Bidang })
+                              .Select(bg => new BidangGrouped
+                              {
+                                  Kode_Bidang = bg.Key.Kode_Bidang,
+                                  Nama_Bidang = bg.Key.Nama_Bidang,
+                                  Pilihan = bg.Select(x => x.Pilihan).ToList()
+                              }).ToList()
+                }).FirstOrDefault();
+        }
     }//Class
 }//Namespace
