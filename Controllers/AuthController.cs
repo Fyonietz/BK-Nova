@@ -150,7 +150,7 @@ namespace BKNova.Controllers
             {
                 try
                 {
-                    var userId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+                var userId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
                     var ok = await services.ChangePassword(userId, data, pServices);
                     if (!ok)
