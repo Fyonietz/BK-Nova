@@ -23,6 +23,20 @@ namespace BKNova.Models
       public string Tanggal_Perjanjian {get;set;}
       public string Tanggal_Pembuatan {get;set;}
     }
+            
+    public class TiketBKDTO{
+      public int Id {get;set;}
+      public string Siswa {get;set;} = string.Empty;
+      public string Kelas {get;set;} = string.Empty;
+      public string Jurusan{get;set;} = string.Empty;
+      public string Judul {get;set;} =string.Empty;
+      public string Isi {get;set;} = string.Empty;
+      public string Status {get;set;} = string.Empty;
+      public string Tempat {get;set;} = string.Empty;
+      public string Tanggal_Perjanjian {get;set;}
+      public string Tanggal_Pembuatan {get;set;}
+    }
+
 
     public class TiketUpdate{
       public int Id {get;set;}

@@ -78,6 +78,78 @@ namespace BKNova.Controllers
                 }
 
             }).RequireAuthorization(Policies.Siswa);
+
+
+            //BK
+
+            g.MapGet("/bk/{IdUser}", async (TiketServices services, int IdUser) =>
+            {
+                try
+                {
+                    var res = await services.BKGet(IdUser);
+                    return Results.Ok(res);
+                }
+                catch (Exception e)
+                {
+                    return Results.InternalServerError(e.Message);
+                }
+            }).RequireAuthorization(Policies.BK);
+
+
+            g.MapPatch("/bk/setujui/{IdTiket}", async (TiketServices services, TiketUpdate data, int IdTiket) =>
+            {
+                try
+                {
+                    var res = await services.BKSetujui(IdTiket, data);
+                    if (!res) return Results.Problem();
+                    return Results.Ok();
+                }
+                catch (Exception e) { return Results.InternalServerError(e.Message); }
+            }).RequireAuthorization(Policies.BK);
+
+            g.MapPatch("/bk/lokasi/{IdTiket}", async (TiketServices services, TiketUpdate data, int IdTiket) =>
+            {
+                try
+                {
+                    var res = await services.BKEditLokasi(IdTiket, data);
+                    if (!res) return Results.Problem();
+                    return Results.Ok();
+                }
+                catch (Exception e) { return Results.InternalServerError(e.Message); }
+            }).RequireAuthorization(Policies.BK);
+
+            g.MapPatch("/bk/tunda/{IdTiket}", async (TiketServices services, TiketUpdate data, int IdTiket) =>
+            {
+                try
+                {
+                    var res = await services.BKTunda(IdTiket, data);
+                    if (!res) return Results.Problem();
+                    return Results.Ok();
+                }
+                catch (Exception e) { return Results.InternalServerError(e.Message); }
+            }).RequireAuthorization(Policies.BK);
+
+            g.MapPatch("/bk/batalkan/{IdTiket}", async (TiketServices services, int IdTiket) =>
+            {
+                try
+                {
+                    var res = await services.BKBatalkan(IdTiket);
+                    if (!res) return Results.Problem();
+                    return Results.Ok();
+                }
+                catch (Exception e) { return Results.InternalServerError(e.Message); }
+            }).RequireAuthorization(Policies.BK);
+
+            g.MapPatch("/bk/selesai/{IdTiket}", async (TiketServices services, int IdTiket) =>
+            {
+                try
+                {
+                    var res = await services.BKSelesai(IdTiket);
+                    if (!res) return Results.Problem();
+                    return Results.Ok();
+                }
+                catch (Exception e) { return Results.InternalServerError(e.Message); }
+            }).RequireAuthorization(Policies.BK);
         }
     }
 }

@@ -26,9 +26,11 @@ CREATE TABLE IF NOT EXISTS User(
 ---Class Master---
 CREATE TABLE IF NOT EXISTS Tahun_Ajaran(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  Nama VARCHAR(255) NOT NULL UNIQUE,
-  Semester enum('Ganjil','Genap') NOT NULL,
-  Is_Active tinyint(1) DEFAULT 0
+  Nama VARCHAR(255) NOT NULL,
+  Semester ENUM('Ganjil','Genap') NOT NULL,
+  Is_Active TINYINT(1) DEFAULT 0,
+
+  UNIQUE (Nama, Semester)
 );
 
 CREATE TABLE IF NOT EXISTS Jurusan(
