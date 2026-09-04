@@ -131,6 +131,7 @@ builder.Services.AddScoped<AumServices>();
 builder.Services.AddScoped<BKServices>();
 //Tiket
 builder.Services.AddScoped<StatusTiketServices>();
+builder.Services.AddScoped<TiketServices>();
 
 var app = builder.Build();
 
@@ -170,7 +171,9 @@ app.Use(async (context, next) =>
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.MapGet("/",()=>{
+    return Results.Ok("Server Running");
+});
 // ─────────────────────────────────────────────
 // 6. ENDPOINT MAPPING
 // ─────────────────────────────────────────────
@@ -186,5 +189,6 @@ app.MapSoalMasalah();
 app.MapAum();
 app.MapBK();
 app.MapStatusTiket();
+app.MapTiket();
 
 app.Run();

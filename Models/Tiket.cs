@@ -13,16 +13,15 @@ namespace BKNova.Models
       public int Id_Status {get;set;}
     }
 
-    public class TiketDTO{
+    public class TiketSiswaDTO{
       public int Id {get;set;}
-      public string NamaSiswa{get;set;} = string.Empty;
-      public string NamaBK {get;set;} = string.Empty;
+      public string BK {get;set;} = string.Empty;
       public string Judul {get;set;} =string.Empty;
       public string Isi {get;set;} = string.Empty;
       public string Status {get;set;} = string.Empty;
       public string Tempat {get;set;} = string.Empty;
-      public DateTime? TanggalPerjanjian {get;set;}
-      public DateTime? TanggalPembuatan {get;set;}
+      public string Tanggal_Perjanjian {get;set;}
+      public string Tanggal_Pembuatan {get;set;}
     }
 
     public class TiketUpdate{
