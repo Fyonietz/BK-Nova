@@ -167,7 +167,7 @@ CREATE TABLE IF NOT EXISTS Status_Tiket(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Nama VARCHAR(255) NOT NULL
 )
-
+INSERT INTO Status_Tiket(Nama) VALUES ('Dikirim'),('Disetujui'),('Ditunda'),('Dibatalkan'),('Selesai');
 CREATE TABLE IF NOT EXISTS Tiket(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Id_Siswa INT,
@@ -177,7 +177,8 @@ CREATE TABLE IF NOT EXISTS Tiket(
   Tanggal_Pembuatan TIMESTAMP NULL DEFAULT current_timestamp(),
   Tanggal_Perjanjian DATETIME NULL DEFAULT NULL,
   Id_Status INT,
-  
+  Tempat VARCHAR(255),
+
   CONSTRAINT fk_Tiket_Siswa FOREIGN KEY(Id_Siswa)
   REFERENCES Siswa(Id),
 

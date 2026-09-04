@@ -129,6 +129,8 @@ builder.Services.AddScoped<BidangMasalahServices>();
 builder.Services.AddScoped<SoalMasalahServices>();
 builder.Services.AddScoped<AumServices>();
 builder.Services.AddScoped<BKServices>();
+//Tiket
+builder.Services.AddScoped<StatusTiketServices>();
 
 var app = builder.Build();
 
@@ -183,5 +185,6 @@ app.MapBidangMasalah();
 app.MapSoalMasalah();
 app.MapAum();
 app.MapBK();
+app.MapStatusTiket();
 
 app.Run();
