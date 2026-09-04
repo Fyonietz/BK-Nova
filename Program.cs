@@ -133,6 +133,9 @@ builder.Services.AddScoped<BKServices>();
 builder.Services.AddScoped<StatusTiketServices>();
 builder.Services.AddScoped<TiketServices>();
 
+//Kuesioner
+builder.Services.AddScoped<KuesionerServices>();
+builder.Services.AddScoped<JawabanKuesionerServices>();
 var app = builder.Build();
 
 // ─────────────────────────────────────────────
@@ -190,5 +193,5 @@ app.MapAum();
 app.MapBK();
 app.MapStatusTiket();
 app.MapTiket();
-
+app.MapKuesioner();
 app.Run();

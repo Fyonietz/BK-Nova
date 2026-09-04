@@ -199,3 +199,74 @@ CREATE TABLE IF NOT EXISTS Riwayat_Tiket(
   CONSTRAINT fk_Riwayat_Tiket FOREIGN KEY(Id_Tiket)
   REFERENCES Tiket(Id)
 )
+
+ CREATE TABLE IF NOT EXISTS Kuesioner(
+  Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  Id_User_BK INT,
+  Id_Kelas INT,
+  Id_Tahun_Ajaran INT,
+  Judul VARCHAR(255) NOT NULL,
+  Deskripsi TEXT,
+  Created_At TIMESTAMP NULL DEFAULT current_timestamp(),
+
+  CONSTRAINT fk_Kuesioner_BK FOREIGN KEY(Id_User_BK)
+  REFERENCES User(Id),
+
+  CONSTRAINT fk_Kuesioner_Kelas FOREIGN KEY(Id_Kelas)
+  REFERENCES Kelas(Id),
+
+  CONSTRAINT fk_Kuesioner_TahunAjaran FOREIGN KEY(Id_Tahun_Ajaran)
+  REFERENCES Tahun_Ajaran(Id)
+);
+
+CREATE TABLE IF NOT EXISTS Soal_Kuesioner(
+  Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  Id_Kuesioner INT,
+  Pertanyaan TEXT NOT NULL,
+  Tipe ENUM('Pilihan Ganda','Esai') NOT NULL,
+  Urutan INT NOT NULL,
+
+  CONSTRAINT fk_Soal_Kuesioner FOREIGN KEY(Id_Kuesioner)
+  REFERENCES Kuesioner(Id)
+);
+
+CREATE TABLE IF NOT EXISTS Opsi_Jawaban(
+  Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  Id_Soal INT,
+  Teks VARCHAR(255) NOT NULL,
+  Urutan INT NOT NULL,
+
+  CONSTRAINT fk_Opsi_Soal FOREIGN KEY(Id_Soal)
+  REFERENCES Soal_Kuesioner(Id)
+);
+
+CREATE TABLE IF NOT EXISTS Jawaban_Kuesioner(
+  Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  Id_Siswa INT,
+  Id_Soal INT,
+  Id_Opsi INT NULL,        -- untuk PG
+  Teks_Jawaban TEXT NULL,  -- untuk Esai
+  Answered_At TIMESTAMP NULL DEFAULT current_timestamp(),
+
+  CONSTRAINT fk_Jawaban_Siswa FOREIGN KEY(Id_Siswa)
+  REFERENCES Siswa(Id),
+
+  CONSTRAINT fk_Jawaban_Soal FOREIGN KEY(Id_Soal)
+  REFERENCES Soal_Kuesioner(Id),
+
+  CONSTRAINT fk_Jawaban_Opsi FOREIGN KEY(Id_Opsi)
+  REFERENCES Opsi_Jawaban(Id)
+);
+
+CREATE TABLE IF NOT EXISTS Status_Submit_Kuesioner(
+  Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  Id_Siswa INT,
+  Id_Kuesioner INT,
+  Submitted_At TIMESTAMP NULL DEFAULT current_timestamp(),
+
+  CONSTRAINT fk_Submit_Siswa FOREIGN KEY(Id_Siswa)
+  REFERENCES Siswa(Id),
+
+  CONSTRAINT fk_Submit_Kuesioner FOREIGN KEY(Id_Kuesioner)
+  REFERENCES Kuesioner(Id)
+);
