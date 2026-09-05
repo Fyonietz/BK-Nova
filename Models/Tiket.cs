@@ -27,6 +27,7 @@ namespace BKNova.Models
     public class TiketBKDTO{
       public int Id {get;set;}
       public string Siswa {get;set;} = string.Empty;
+      public string Tingkat {get;set;} = string.Empty;
       public string Kelas {get;set;} = string.Empty;
       public string Jurusan{get;set;} = string.Empty;
       public string Judul {get;set;} =string.Empty;

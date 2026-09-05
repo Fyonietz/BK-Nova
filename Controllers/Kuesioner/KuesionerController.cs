@@ -1,4 +1,4 @@
- using BKNova.Services;
+using BKNova.Services;
 using BKNova.Models;
 
 namespace BKNova.Controllers
@@ -18,8 +18,14 @@ namespace BKNova.Controllers
                     if (!res) return Results.Problem();
                     return Results.Created();
                 }
-                catch (Exception e) { return Results.InternalServerError(e.Message); }
-            }).RequireAuthorization(Policies.BK);
+                catch (Exception e)
+                {
+                    Console.WriteLine($"CONTROLLER ERROR: {e.Message}");
+                    Console.WriteLine(e.StackTrace);
+                    return Results.InternalServerError(e.Message);
+                }
+            });
+            // .RequireAuthorization(Policies.BK);
 
             g.MapGet("/bk/{IdUser}", async (KuesionerServices services, int IdUser) =>
             {

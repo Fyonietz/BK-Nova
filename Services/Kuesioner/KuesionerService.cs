@@ -12,13 +12,13 @@ namespace BKNova.Services
         public async Task<bool> BuatKuesioner(int Id_User_BK, Kuesioner data)
         {
             using var conn = db.connect();
-            conn.Open();
-            using var tx = conn.BeginTransaction();
+            await conn.OpenAsync();
+            using var tx = await conn.BeginTransactionAsync();
             try
             {
                 string sqlKuesioner = @"INSERT INTO Kuesioner(Id_User_BK, Id_Kelas, Id_Tahun_Ajaran, Judul, Deskripsi) 
-                                        VALUES(@BK, @Kelas, @TahunAjaran, @Judul, @Deskripsi);
-                                        SELECT LAST_INSERT_ID();";
+                                VALUES(@BK, @Kelas, @TahunAjaran, @Judul, @Deskripsi);
+                                SELECT LAST_INSERT_ID();";
                 int Id_Kuesioner = await conn.QueryFirstAsync<int>(sqlKuesioner, new
                 {
                     BK = Id_User_BK,
@@ -31,8 +31,8 @@ namespace BKNova.Services
                 foreach (var soal in data.Soal)
                 {
                     string sqlSoal = @"INSERT INTO Soal_Kuesioner(Id_Kuesioner, Pertanyaan, Tipe, Urutan)
-                                       VALUES(@Kuesioner, @Pertanyaan, @Tipe, @Urutan);
-                                       SELECT LAST_INSERT_ID();";
+                               VALUES(@Kuesioner, @Pertanyaan, @Tipe, @Urutan);
+                               SELECT LAST_INSERT_ID();";
                     int Id_Soal = await conn.QueryFirstAsync<int>(sqlSoal, new
                     {
                         Kuesioner = Id_Kuesioner,
@@ -41,12 +41,12 @@ namespace BKNova.Services
                         soal.Urutan
                     }, tx);
 
-                    if (soal.Tipe == "PG")
+                    if (soal.Tipe == "Pilihan Ganda" && soal.Opsi.Count > 0)
                     {
                         foreach (var opsi in soal.Opsi)
                         {
                             string sqlOpsi = @"INSERT INTO Opsi_Jawaban(Id_Soal, Teks, Urutan)
-                                               VALUES(@Soal, @Teks, @Urutan)";
+                                       VALUES(@Soal, @Teks, @Urutan)";
                             await conn.ExecuteAsync(sqlOpsi, new
                             {
                                 Soal = Id_Soal,
@@ -57,12 +57,13 @@ namespace BKNova.Services
                     }
                 }
 
-                tx.Commit();
+                await tx.CommitAsync();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
-                tx.Rollback();
+                await tx.RollbackAsync();
+                Console.WriteLine($"ERROR: {ex.Message}");
                 return false;
             }
         }
