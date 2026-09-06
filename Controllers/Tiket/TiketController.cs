@@ -25,6 +25,8 @@ namespace BKNova.Controllers
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine($"CONTROLLER ERROR: {e.Message}");
+                    Console.WriteLine(e.StackTrace);
                     return Results.InternalServerError(e.Message);
                 }
             }).RequireAuthorization(Policies.Siswa);

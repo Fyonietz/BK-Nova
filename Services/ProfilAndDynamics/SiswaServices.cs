@@ -76,6 +76,7 @@ namespace BKNova.Services
         {
             using var conn = db.connect();
             string sql = @"SELECT 
+              s.Id AS IdSiswa,
               s.NIS,
               s.NISN,
               s.Jenis_Kelamin AS Kelamin,
@@ -84,7 +85,7 @@ namespace BKNova.Services
               u.Refresh_Token,
               u.Refresh_Token_Expired,
               u.Created_At,
-              u.Id as Id,
+              u.Id AS IdUser,
               k.Nama as Kelas,
               k.Tingkat as Tingkat
               FROM Siswa s 
@@ -98,6 +99,7 @@ namespace BKNova.Services
         {
             using var conn = db.connect();
             string sql = @"SELECT 
+              s.Id AS IdSiswa,
               s.NIS,
               s.NISN,
               s.Jenis_Kelamin AS Kelamin,
@@ -106,7 +108,7 @@ namespace BKNova.Services
               u.Refresh_Token,
               u.Refresh_Token_Expired,
               u.Created_At,
-              u.Id as Id,
+              u.Id AS IdUser,
               k.Nama as Kelas,
               k.Tingkat as Tingkat
               FROM Siswa s 

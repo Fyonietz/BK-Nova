@@ -32,7 +32,7 @@ namespace BKNova.Controllers
                     return Results.Ok(res);
                 }
                 catch (Exception e) { return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message); }
-            });
+            }).RequireAuthorization(Policies.BK);
 
             g.MapGet("/hasil/{idGuru:int}/{idSiswa}", async (AumServices services, int idGuru,int idSiswa) =>
             {

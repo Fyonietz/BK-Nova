@@ -27,10 +27,11 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                     "http://localhost:3000",   
+                    "http://0.0.0.0:3000",   
                     "http://localhost:5173",   
                     "http://localhost:4200",
                     "http://192.168.69.50:5173",
-                    "https://yourdomain.com"   
+                    "https://shine-carrier-order-entitled.trycloudflare.com"   
               )
               .AllowAnyMethod()
               .AllowAnyHeader()
@@ -149,6 +150,7 @@ var app = builder.Build();
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "BKNova API v1");
     });
 
+app.UseCors("AllowAll");
 app.UseCors("AllowWebFrontend");
 
 // Logger

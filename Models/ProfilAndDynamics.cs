@@ -35,7 +35,8 @@ namespace BKNova.Models
 
     public class SiswaDTO
     {
-        public int Id { get; set; }
+        public int IdSiswa { get; set; }
+        public int IdUser { get; set; }
         public string Nama { get; set; } = string.Empty;
         public string Kelas { get; set; } = string.Empty;
         public string Tingkat { get; set; } = string.Empty;
