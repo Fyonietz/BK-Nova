@@ -44,6 +44,19 @@ namespace BKNova.Controllers
                     return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message);
                 }
             }).RequireAuthorization(Policies.Admin);
+
+            g.MapGet("/paged", async (BKServices services, int page = 1, int pageSize = 10) =>
+            {
+                try
+                {
+                    var result = await services.GetAllPaginated(page, pageSize);
+                    return Results.Ok(result);
+                }
+                catch (Exception e)
+                {
+                    return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message);
+                }
+            }).RequireAuthorization(Policies.Admin);
             g.MapPost("/tugas", async (BKServices services, TugasBK data) =>
            {
                try
@@ -61,12 +74,33 @@ namespace BKNova.Controllers
                 catch (Exception e) { return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message); }
             }).RequireAuthorization(Policies.Admin);
 
+            g.MapGet("/tugas/paged", async (BKServices services, int page = 1, int pageSize = 10) =>
+            {
+                try
+                {
+                    var result = await services.GetAllTugasPaginated(page, pageSize);
+                    return Results.Ok(result);
+                }
+                catch (Exception e) { return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message); }
+            }).RequireAuthorization(Policies.Admin);
+
             g.MapGet("/tugas/me", async (BKServices services, ClaimsPrincipal user) =>
             {
                 try
                 {
                     var idUser = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
                     return Results.Ok(await services.GetTugasByBK(idUser));
+                }
+                catch (Exception e) { return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message); }
+            }).RequireAuthorization(Policies.BK);
+
+            g.MapGet("/tugas/me/paged", async (BKServices services, ClaimsPrincipal user, int page = 1, int pageSize = 10) =>
+            {
+                try
+                {
+                    var idUser = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+                    var result = await services.GetTugasByBKPaginated(idUser, page, pageSize);
+                    return Results.Ok(result);
                 }
                 catch (Exception e) { return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message); }
             }).RequireAuthorization(Policies.BK);

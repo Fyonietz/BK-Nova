@@ -41,6 +41,19 @@ namespace BKNova.Controllers
 
             }).RequireAuthorization(Policies.Admin);
 
+            g.MapGet("/paged", async (SiswaServices services, int page = 1, int pageSize = 10) =>
+            {
+                try
+                {
+                    var result = await services.GetAllPaginated(page, pageSize);
+                    return Results.Ok(result);
+                }
+                catch (Exception e)
+                {
+                    return Results.Problem(title: "Internal Server Error", statusCode: StatusCodes.Status500InternalServerError, detail: e.Message);
+                }
+            }).RequireAuthorization(Policies.Admin);
+
             g.MapGet("/kelas/{id}", async (SiswaServices services,int id) =>
             {
 
@@ -54,6 +67,19 @@ namespace BKNova.Controllers
                     return Results.Problem(title: "Internal Server Error", statusCode: StatusCodes.Status500InternalServerError, detail: e.Message);
                 }
 
+            }).RequireAuthorization(Policies.BK);
+
+            g.MapGet("/kelas/{id}/paged", async (SiswaServices services, int id, int page = 1, int pageSize = 10) =>
+            {
+                try
+                {
+                    var result = await services.GetByKelasPaginated(id, page, pageSize);
+                    return Results.Ok(result);
+                }
+                catch (Exception e)
+                {
+                    return Results.Problem(title: "Internal Server Error", statusCode: StatusCodes.Status500InternalServerError, detail: e.Message);
+                }
             }).RequireAuthorization(Policies.BK);
             g.MapGet("/{id}", async (SiswaServices services, int id) =>
             {

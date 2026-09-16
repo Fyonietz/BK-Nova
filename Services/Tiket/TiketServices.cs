@@ -73,6 +73,58 @@ namespace BKNova.Services
             return res.ToList();
 
         }
+
+        public async Task<PaginatedResponse<TiketSiswaDTO>> SiswaGetPaginated(int Id_User, int page, int pageSize)
+        {
+            var (safePage, safePageSize) = PaginationHelper.Normalize(page, pageSize);
+            int offset = (safePage - 1) * safePageSize;
+
+            var identity = await GetIdBKAndIdSiswa(Id_User);
+            if (!identity.Success || !identity.Id_Siswa.HasValue)
+            {
+                return new PaginatedResponse<TiketSiswaDTO>
+                {
+                    Page = safePage,
+                    PageSize = safePageSize,
+                    TotalItems = 0,
+                    TotalPages = 0,
+                    HasNextPage = false,
+                    HasPreviousPage = false,
+                    Data = new List<TiketSiswaDTO>()
+                };
+            }
+
+            using var conn = db.connect();
+            string countSql = @"SELECT COUNT(*) FROM Tiket WHERE Id_Siswa = @Siswa";
+            string sql = @"SELECT t.Id,b.Nama AS BK,
+            t.Judul,
+            t.Isi,
+            t.Tanggal_Pembuatan,
+            t.Tanggal_Perjanjian,
+            t.Tempat,
+            s.Nama AS Status
+            FROM Tiket t
+            JOIN User b ON b.Id = t.Id_BK
+            JOIN Status_Tiket s ON s.Id = t.Id_Status
+            WHERE Id_Siswa = @Siswa
+            ORDER BY t.Id
+            LIMIT @PageSize OFFSET @Offset";
+
+            var totalItems = await conn.ExecuteScalarAsync<int>(countSql, new { Siswa = identity.Id_Siswa });
+            var rows = (await conn.QueryAsync<TiketSiswaDTO>(sql, new { Siswa = identity.Id_Siswa, PageSize = safePageSize, Offset = offset })).ToList();
+            int totalPages = totalItems == 0 ? 0 : (int)Math.Ceiling((double)totalItems / safePageSize);
+
+            return new PaginatedResponse<TiketSiswaDTO>
+            {
+                Page = safePage,
+                PageSize = safePageSize,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                HasNextPage = safePage < totalPages,
+                HasPreviousPage = safePage > 1,
+                Data = rows
+            };
+        }
         public async Task<bool> SiswaUpdateTiket(int Id_Tiket, Tiket data)
         {
             using var conn = db.connect();
@@ -128,6 +180,49 @@ namespace BKNova.Services
             var res = await conn.QueryAsync<TiketBKDTO>(sql, new { BK = Id_User });
             return res.ToList();
 
+        }
+
+        public async Task<PaginatedResponse<TiketBKDTO>> BKGetPaginated(int Id_User, int page, int pageSize)
+        {
+            var (safePage, safePageSize) = PaginationHelper.Normalize(page, pageSize);
+            int offset = (safePage - 1) * safePageSize;
+
+            using var conn = db.connect();
+            string countSql = @"SELECT COUNT(*) FROM Tiket WHERE Id_BK = @BK";
+            string sql = @"SELECT t.Id,u.Nama AS Siswa,
+            k.Tingkat,
+            k.Nama AS Kelas,
+            j.Kode AS Jurusan,
+            t.Judul,
+            t.Isi,
+            t.Tanggal_Pembuatan,
+            t.Tanggal_Perjanjian,
+            t.Tempat,
+            st.Nama AS Status
+            FROM Tiket t
+            JOIN Siswa si ON si.Id = t.Id_Siswa
+            JOIN User u ON u.Id = si.Id_User
+            JOIN Kelas k on k.Id = si.Id_Kelas
+            JOIN Jurusan j ON j.Id = k.Id_Jurusan 
+            JOIN Status_Tiket st ON st.Id = t.Id_Status
+            WHERE t.Id_BK = @BK
+            ORDER BY t.Id
+            LIMIT @PageSize OFFSET @Offset";
+
+            var totalItems = await conn.ExecuteScalarAsync<int>(countSql, new { BK = Id_User });
+            var rows = (await conn.QueryAsync<TiketBKDTO>(sql, new { BK = Id_User, PageSize = safePageSize, Offset = offset })).ToList();
+            int totalPages = totalItems == 0 ? 0 : (int)Math.Ceiling((double)totalItems / safePageSize);
+
+            return new PaginatedResponse<TiketBKDTO>
+            {
+                Page = safePage,
+                PageSize = safePageSize,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                HasNextPage = safePage < totalPages,
+                HasPreviousPage = safePage > 1,
+                Data = rows
+            };
         }
         public async Task<bool> BKSetujui(int Id_Tiket, TiketUpdate data)
         {

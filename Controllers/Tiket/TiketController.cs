@@ -43,6 +43,19 @@ namespace BKNova.Controllers
                     return Results.InternalServerError(e.Message);
                 }
             }).RequireAuthorization(Policies.Siswa);
+
+            g.MapGet("/{IdUser}/paged", async (TiketServices services, int IdUser, int page = 1, int pageSize = 10) =>
+            {
+                try
+                {
+                    var res = await services.SiswaGetPaginated(IdUser, page, pageSize);
+                    return Results.Ok(res);
+                }
+                catch (Exception e)
+                {
+                    return Results.InternalServerError(e.Message);
+                }
+            }).RequireAuthorization(Policies.Siswa);
             g.MapPatch("/{IdTiket}", async (TiketServices services, Tiket data, int IdTiket) =>
             {
 
@@ -97,6 +110,18 @@ namespace BKNova.Controllers
                 }
             }).RequireAuthorization(Policies.BK);
 
+            g.MapGet("/bk/{IdUser}/paged", async (TiketServices services, int IdUser, int page = 1, int pageSize = 10) =>
+            {
+                try
+                {
+                    var res = await services.BKGetPaginated(IdUser, page, pageSize);
+                    return Results.Ok(res);
+                }
+                catch (Exception e)
+                {
+                    return Results.InternalServerError(e.Message);
+                }
+            }).RequireAuthorization(Policies.BK);
 
             g.MapPatch("/bk/setujui/{IdTiket}", async (TiketServices services, TiketUpdate data, int IdTiket) =>
             {

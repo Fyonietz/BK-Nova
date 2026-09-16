@@ -37,6 +37,16 @@ namespace BKNova.Controllers
                 catch (Exception e) { return Results.InternalServerError(e.Message); }
             }).RequireAuthorization(Policies.BK);
 
+            g.MapGet("/bk/{IdUser}/paged", async (KuesionerServices services, int IdUser, int page = 1, int pageSize = 10) =>
+            {
+                try
+                {
+                    var res = await services.BKGetListPaginated(IdUser, page, pageSize);
+                    return Results.Ok(res);
+                }
+                catch (Exception e) { return Results.InternalServerError(e.Message); }
+            }).RequireAuthorization(Policies.BK);
+
             g.MapGet("/bk/detail/{IdKuesioner}", async (KuesionerServices services, int IdKuesioner) =>
             {
                 try
@@ -64,6 +74,16 @@ namespace BKNova.Controllers
                 try
                 {
                     var res = await services.SiswaGetList(IdUser);
+                    return Results.Ok(res);
+                }
+                catch (Exception e) { return Results.InternalServerError(e.Message); }
+            }).RequireAuthorization(Policies.Siswa);
+
+            g.MapGet("/siswa/{IdUser}/paged", async (JawabanKuesionerServices services, int IdUser, int page = 1, int pageSize = 10) =>
+            {
+                try
+                {
+                    var res = await services.SiswaGetListPaginated(IdUser, page, pageSize);
                     return Results.Ok(res);
                 }
                 catch (Exception e) { return Results.InternalServerError(e.Message); }

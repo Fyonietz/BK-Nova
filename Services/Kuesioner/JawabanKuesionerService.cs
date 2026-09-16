@@ -31,6 +31,61 @@ namespace BKNova.Services
             return res.ToList();
         }
 
+        public async Task<PaginatedResponse<KuesionerDTO>> SiswaGetListPaginated(int Id_User, int page, int pageSize)
+        {
+            var (safePage, safePageSize) = PaginationHelper.Normalize(page, pageSize);
+            int offset = (safePage - 1) * safePageSize;
+
+            using var conn = db.connect();
+            string sqlSiswa = "SELECT Id, Id_Kelas FROM Siswa WHERE Id_User=@IdUser";
+            var siswa = await conn.QueryFirstOrDefaultAsync<(int Id, int Id_Kelas)>(sqlSiswa, new { IdUser = Id_User });
+            if (siswa == default)
+            {
+                return new PaginatedResponse<KuesionerDTO>
+                {
+                    Page = safePage,
+                    PageSize = safePageSize,
+                    TotalItems = 0,
+                    TotalPages = 0,
+                    HasNextPage = false,
+                    HasPreviousPage = false,
+                    Data = new List<KuesionerDTO>()
+                };
+            }
+
+            string countSql = @"SELECT COUNT(*)
+                            FROM Kuesioner k
+                            WHERE k.Id_Kelas = @Kelas";
+            string sql = @"SELECT k.Id, k.Judul, k.Deskripsi,
+                            CONCAT(kl.Tingkat,' ',kl.Nama) AS Kelas,
+                            ta.Nama AS Tahun_Ajaran,
+                            k.Created_At,
+                            CASE WHEN sk.Id IS NOT NULL THEN 1 ELSE 0 END AS Sudah_Submit
+                            FROM Kuesioner k
+                            JOIN Kelas kl ON kl.Id = k.Id_Kelas
+                            JOIN Tahun_Ajaran ta ON ta.Id = k.Id_Tahun_Ajaran
+                            LEFT JOIN Status_Submit_Kuesioner sk 
+                                ON sk.Id_Kuesioner = k.Id AND sk.Id_Siswa = @Siswa
+                            WHERE k.Id_Kelas = @Kelas
+                            ORDER BY k.Id
+                            LIMIT @PageSize OFFSET @Offset";
+
+            var totalItems = await conn.ExecuteScalarAsync<int>(countSql, new { Kelas = siswa.Id_Kelas });
+            var rows = (await conn.QueryAsync<KuesionerDTO>(sql, new { Siswa = siswa.Id, Kelas = siswa.Id_Kelas, PageSize = safePageSize, Offset = offset })).ToList();
+            int totalPages = totalItems == 0 ? 0 : (int)Math.Ceiling((double)totalItems / safePageSize);
+
+            return new PaginatedResponse<KuesionerDTO>
+            {
+                Page = safePage,
+                PageSize = safePageSize,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                HasNextPage = safePage < totalPages,
+                HasPreviousPage = safePage > 1,
+                Data = rows
+            };
+        }
+
         // Siswa - Lihat detail Kuesioner (untuk diisi)
         public async Task<KuesionerDetailDTO?> SiswaGetDetail(int Id_Kuesioner)
         {

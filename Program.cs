@@ -31,7 +31,7 @@ builder.Services.AddCors(options =>
                     "http://localhost:5173",   
                     "http://localhost:4200",
                     "http://192.168.69.50:5173",
-                    "https://shine-carrier-order-entitled.trycloudflare.com"   
+                    "https://landing-vat-military-stan.trycloudflare.com"   
               )
               .AllowAnyMethod()
               .AllowAnyHeader()

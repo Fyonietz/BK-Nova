@@ -84,6 +84,40 @@ namespace BKNova.Services
             return res.ToList();
         }
 
+        public async Task<PaginatedResponse<KuesionerDTO>> BKGetListPaginated(int Id_User_BK, int page, int pageSize)
+        {
+            var (safePage, safePageSize) = PaginationHelper.Normalize(page, pageSize);
+            int offset = (safePage - 1) * safePageSize;
+
+            using var conn = db.connect();
+            string countSql = @"SELECT COUNT(*) FROM Kuesioner WHERE Id_User_BK = @BK";
+            string sql = @"SELECT k.Id, k.Judul, k.Deskripsi,
+                            CONCAT(kl.Tingkat,' ',kl.Nama) AS Kelas,
+                            ta.Nama AS Tahun_Ajaran,
+                            k.Created_At
+                            FROM Kuesioner k
+                            JOIN Kelas kl ON kl.Id = k.Id_Kelas
+                            JOIN Tahun_Ajaran ta ON ta.Id = k.Id_Tahun_Ajaran
+                            WHERE k.Id_User_BK = @BK
+                            ORDER BY k.Id
+                            LIMIT @PageSize OFFSET @Offset";
+
+            var totalItems = await conn.ExecuteScalarAsync<int>(countSql, new { BK = Id_User_BK });
+            var rows = (await conn.QueryAsync<KuesionerDTO>(sql, new { BK = Id_User_BK, PageSize = safePageSize, Offset = offset })).ToList();
+            int totalPages = totalItems == 0 ? 0 : (int)Math.Ceiling((double)totalItems / safePageSize);
+
+            return new PaginatedResponse<KuesionerDTO>
+            {
+                Page = safePage,
+                PageSize = safePageSize,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                HasNextPage = safePage < totalPages,
+                HasPreviousPage = safePage > 1,
+                Data = rows
+            };
+        }
+
         // BK - Lihat detail Kuesioner + Soal + Opsi
         public async Task<KuesionerDetailDTO?> BKGetDetail(int Id_Kuesioner)
         {

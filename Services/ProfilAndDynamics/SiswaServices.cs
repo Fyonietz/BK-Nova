@@ -95,6 +95,48 @@ namespace BKNova.Services
             return result.ToList();
         }
 
+        public async Task<PaginatedResponse<SiswaDTO>> GetAllPaginated(int page, int pageSize)
+        {
+            var (safePage, safePageSize) = PaginationHelper.Normalize(page, pageSize);
+            int offset = (safePage - 1) * safePageSize;
+
+            using var conn = db.connect();
+            string countSql = @"SELECT COUNT(*) FROM Siswa";
+            string sql = @"SELECT 
+              s.Id AS IdSiswa,
+              s.NIS,
+              s.NISN,
+              s.Jenis_Kelamin AS Kelamin,
+              s.Tempat_Tanggal_Lahir,
+              u.Nama as Nama,
+              u.Refresh_Token,
+              u.Refresh_Token_Expired,
+              u.Created_At,
+              u.Id AS IdUser,
+              k.Nama as Kelas,
+              k.Tingkat as Tingkat
+              FROM Siswa s 
+              JOIN User u ON u.id = s.Id_User
+              JOIN Kelas k ON k.Id = s.Id_Kelas
+              ORDER BY s.Id
+              LIMIT @PageSize OFFSET @Offset";
+
+            var totalItems = await conn.ExecuteScalarAsync<int>(countSql);
+            var rows = (await conn.QueryAsync<SiswaDTO>(sql, new { PageSize = safePageSize, Offset = offset })).ToList();
+            int totalPages = totalItems == 0 ? 0 : (int)Math.Ceiling((double)totalItems / safePageSize);
+
+            return new PaginatedResponse<SiswaDTO>
+            {
+                Page = safePage,
+                PageSize = safePageSize,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                HasNextPage = safePage < totalPages,
+                HasPreviousPage = safePage > 1,
+                Data = rows
+            };
+        }
+
         public async Task<List<SiswaDTO>> GetByKelas(int Id)
         {
             using var conn = db.connect();
@@ -116,6 +158,49 @@ namespace BKNova.Services
               JOIN Kelas k ON k.Id = s.Id_Kelas WHERE k.Id = @Id";
             var result = await conn.QueryAsync<SiswaDTO>(sql,new {Id = Id});
             return result.ToList();
+        }
+
+        public async Task<PaginatedResponse<SiswaDTO>> GetByKelasPaginated(int idKelas, int page, int pageSize)
+        {
+            var (safePage, safePageSize) = PaginationHelper.Normalize(page, pageSize);
+            int offset = (safePage - 1) * safePageSize;
+
+            using var conn = db.connect();
+            string countSql = @"SELECT COUNT(*) FROM Siswa s JOIN Kelas k ON k.Id = s.Id_Kelas WHERE k.Id = @Id";
+            string sql = @"SELECT 
+              s.Id AS IdSiswa,
+              s.NIS,
+              s.NISN,
+              s.Jenis_Kelamin AS Kelamin,
+              s.Tempat_Tanggal_Lahir,
+              u.Nama as Nama,
+              u.Refresh_Token,
+              u.Refresh_Token_Expired,
+              u.Created_At,
+              u.Id AS IdUser,
+              k.Nama as Kelas,
+              k.Tingkat as Tingkat
+              FROM Siswa s 
+              JOIN User u ON u.id = s.Id_User
+              JOIN Kelas k ON k.Id = s.Id_Kelas
+              WHERE k.Id = @Id
+              ORDER BY s.Id
+              LIMIT @PageSize OFFSET @Offset";
+
+            var totalItems = await conn.ExecuteScalarAsync<int>(countSql, new { Id = idKelas });
+            var rows = (await conn.QueryAsync<SiswaDTO>(sql, new { Id = idKelas, PageSize = safePageSize, Offset = offset })).ToList();
+            int totalPages = totalItems == 0 ? 0 : (int)Math.Ceiling((double)totalItems / safePageSize);
+
+            return new PaginatedResponse<SiswaDTO>
+            {
+                Page = safePage,
+                PageSize = safePageSize,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                HasNextPage = safePage < totalPages,
+                HasPreviousPage = safePage > 1,
+                Data = rows
+            };
         }
         public async Task<SiswaDTO> GetById(int Id)
         {
