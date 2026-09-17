@@ -17,17 +17,31 @@ namespace BKNova.Services
             using var tx = await conn.BeginTransactionAsync();
             try
             {
+                // choose a primary kelas for backward compatibility (nullable)
+                int? primaryKelas = data.Id_Kelas.HasValue ? data.Id_Kelas : (data.KelasIds.Count > 0 ? data.KelasIds[0] : null);
+
                 string sqlKuesioner = @"INSERT INTO Kuesioner(Id_User_BK, Id_Kelas, Id_Tahun_Ajaran, Judul, Deskripsi) 
                                 VALUES(@BK, @Kelas, @TahunAjaran, @Judul, @Deskripsi);
                                 SELECT LAST_INSERT_ID();";
                 int Id_Kuesioner = await conn.QueryFirstAsync<int>(sqlKuesioner, new
                 {
                     BK = Id_User_BK,
-                    Kelas = data.Id_Kelas,
+                    Kelas = primaryKelas,
                     TahunAjaran = data.Id_Tahun_Ajaran,
                     data.Judul,
                     data.Deskripsi
                 }, tx);
+
+                // persist mappings to Kuesioner_Kelas for all provided kelas ids (or primaryKelas if none provided)
+                var kelasList = data.KelasIds.Count > 0 ? data.KelasIds : (primaryKelas.HasValue ? new List<int> { primaryKelas.Value } : new List<int>());
+                if (kelasList.Count > 0)
+                {
+                    string insertMap = @"INSERT INTO Kuesioner_Kelas(Id_Kuesioner, Id_Kelas) VALUES(@Kuesioner, @Kelas)";
+                    foreach (var kId in kelasList)
+                    {
+                        await conn.ExecuteAsync(insertMap, new { Kuesioner = Id_Kuesioner, Kelas = kId }, tx);
+                    }
+                }
 
                 foreach (var soal in data.Soal)
                 {
@@ -65,9 +79,10 @@ namespace BKNova.Services
                 {
                     try
                     {
+                        if (kelasList.Count == 0) return;
                         using var conn2 = db.connect();
-                        string sqlTokens = @"SELECT u.FCM_Token FROM Siswa s JOIN User u ON u.Id = s.Id_User WHERE s.Id_Kelas = @Kelas";
-                        var tokens = (await conn2.QueryAsync<string>(sqlTokens, new { Kelas = data.Id_Kelas })).Where(t => !string.IsNullOrWhiteSpace(t)).Distinct();
+                        string sqlTokens = @"SELECT DISTINCT u.FCM_Token FROM Siswa s JOIN User u ON u.Id = s.Id_User WHERE s.Id_Kelas IN @KelasList";
+                        var tokens = (await conn2.QueryAsync<string>(sqlTokens, new { KelasList = kelasList })).Where(t => !string.IsNullOrWhiteSpace(t)).Distinct();
                         foreach (var token in tokens)
                         {
                             await fcm.SendNotificationAsync(token, "Kuesioner Baru", data.Judul ?? "Ada kuesioner baru", new Dictionary<string, string>
@@ -98,11 +113,10 @@ namespace BKNova.Services
         {
             using var conn = db.connect();
             string sql = @"SELECT k.Id, k.Judul, k.Deskripsi,
-                            CONCAT(kl.Tingkat,' ',kl.Nama) AS Kelas,
+                            (SELECT CONCAT(kl.Tingkat,' ',kl.Nama) FROM Kelas kl JOIN Kuesioner_Kelas kk2 ON kk2.Id_Kelas=kl.Id WHERE kk2.Id_Kuesioner = k.Id LIMIT 1) AS Kelas,
                             ta.Nama AS Tahun_Ajaran,
                             k.Created_At
                             FROM Kuesioner k
-                            JOIN Kelas kl ON kl.Id = k.Id_Kelas
                             JOIN Tahun_Ajaran ta ON ta.Id = k.Id_Tahun_Ajaran
                             WHERE k.Id_User_BK = @BK";
             var res = await conn.QueryAsync<KuesionerDTO>(sql, new { BK = Id_User_BK });
@@ -117,11 +131,10 @@ namespace BKNova.Services
             using var conn = db.connect();
             string countSql = @"SELECT COUNT(*) FROM Kuesioner WHERE Id_User_BK = @BK";
             string sql = @"SELECT k.Id, k.Judul, k.Deskripsi,
-                            CONCAT(kl.Tingkat,' ',kl.Nama) AS Kelas,
+                            (SELECT CONCAT(kl.Tingkat,' ',kl.Nama) FROM Kelas kl JOIN Kuesioner_Kelas kk2 ON kk2.Id_Kelas=kl.Id WHERE kk2.Id_Kuesioner = k.Id LIMIT 1) AS Kelas,
                             ta.Nama AS Tahun_Ajaran,
                             k.Created_At
                             FROM Kuesioner k
-                            JOIN Kelas kl ON kl.Id = k.Id_Kelas
                             JOIN Tahun_Ajaran ta ON ta.Id = k.Id_Tahun_Ajaran
                             WHERE k.Id_User_BK = @BK
                             ORDER BY k.Id

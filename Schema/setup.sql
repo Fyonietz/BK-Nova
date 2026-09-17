@@ -223,6 +223,18 @@ CREATE TABLE IF NOT EXISTS Riwayat_Tiket(
   REFERENCES Tahun_Ajaran(Id)
 );
 
+-- Mapping table to allow a kuesioner to be assigned to multiple classes
+CREATE TABLE IF NOT EXISTS Kuesioner_Kelas(
+  Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  Id_Kuesioner INT NOT NULL,
+  Id_Kelas INT NOT NULL,
+  CONSTRAINT fk_KuesionerKuesioner FOREIGN KEY(Id_Kuesioner) REFERENCES Kuesioner(Id) ON DELETE CASCADE,
+  CONSTRAINT fk_KuesionerKelas_Kelas FOREIGN KEY(Id_Kelas) REFERENCES Kelas(Id) ON DELETE CASCADE
+);
+
+-- Backfill note: After deploying, you may want to populate Kuesioner_Kelas
+-- from existing Kuesioner.Id_Kelas values for backward compatibility.
+
 CREATE TABLE IF NOT EXISTS Soal_Kuesioner(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Id_Kuesioner INT,

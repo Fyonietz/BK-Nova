@@ -17,16 +17,15 @@ namespace BKNova.Services
             if (siswa == default) return new();
 
             string sql = @"SELECT k.Id, k.Judul, k.Deskripsi,
-                            CONCAT(kl.Tingkat,' ',kl.Nama) AS Kelas,
+                            (SELECT CONCAT(kl.Tingkat,' ',kl.Nama) FROM Kelas kl JOIN Kuesioner_Kelas kk2 ON kk2.Id_Kelas=kl.Id WHERE kk2.Id_Kuesioner = k.Id LIMIT 1) AS Kelas,
                             ta.Nama AS Tahun_Ajaran,
                             k.Created_At,
                             CASE WHEN sk.Id IS NOT NULL THEN 1 ELSE 0 END AS Sudah_Submit
                             FROM Kuesioner k
-                            JOIN Kelas kl ON kl.Id = k.Id_Kelas
                             JOIN Tahun_Ajaran ta ON ta.Id = k.Id_Tahun_Ajaran
                             LEFT JOIN Status_Submit_Kuesioner sk 
                                 ON sk.Id_Kuesioner = k.Id AND sk.Id_Siswa = @Siswa
-                            WHERE k.Id_Kelas = @Kelas";
+                            WHERE k.Id IN (SELECT Id_Kuesioner FROM Kuesioner_Kelas WHERE Id_Kelas = @Kelas)";
             var res = await conn.QueryAsync<KuesionerDTO>(sql, new { Siswa = siswa.Id, Kelas = siswa.Id_Kelas });
             return res.ToList();
         }
@@ -53,20 +52,20 @@ namespace BKNova.Services
                 };
             }
 
-            string countSql = @"SELECT COUNT(*)
+            string countSql = @"SELECT COUNT(DISTINCT k.Id)
                             FROM Kuesioner k
-                            WHERE k.Id_Kelas = @Kelas";
+                            JOIN Kuesioner_Kelas kk ON kk.Id_Kuesioner = k.Id
+                            WHERE kk.Id_Kelas = @Kelas";
             string sql = @"SELECT k.Id, k.Judul, k.Deskripsi,
-                            CONCAT(kl.Tingkat,' ',kl.Nama) AS Kelas,
+                            (SELECT CONCAT(kl.Tingkat,' ',kl.Nama) FROM Kelas kl JOIN Kuesioner_Kelas kk2 ON kk2.Id_Kelas=kl.Id WHERE kk2.Id_Kuesioner = k.Id LIMIT 1) AS Kelas,
                             ta.Nama AS Tahun_Ajaran,
                             k.Created_At,
                             CASE WHEN sk.Id IS NOT NULL THEN 1 ELSE 0 END AS Sudah_Submit
                             FROM Kuesioner k
-                            JOIN Kelas kl ON kl.Id = k.Id_Kelas
                             JOIN Tahun_Ajaran ta ON ta.Id = k.Id_Tahun_Ajaran
                             LEFT JOIN Status_Submit_Kuesioner sk 
                                 ON sk.Id_Kuesioner = k.Id AND sk.Id_Siswa = @Siswa
-                            WHERE k.Id_Kelas = @Kelas
+                            WHERE k.Id IN (SELECT Id_Kuesioner FROM Kuesioner_Kelas WHERE Id_Kelas = @Kelas)
                             ORDER BY k.Id
                             LIMIT @PageSize OFFSET @Offset";
 

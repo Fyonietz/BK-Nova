@@ -260,7 +260,35 @@ namespace BKNova.Services
             using var conn = db.connect();
             string sql = "UPDATE Tiket SET Id_Status=2, Tempat=@Tempat, Tanggal_Perjanjian=@Tanggal WHERE Id=@Id";
             var res = await conn.ExecuteAsync(sql, new { Id = Id_Tiket, data.Tempat, Tanggal = data.TanggalPerjanjian });
-            return res > 0;
+
+            if (res > 0)
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        using var conn2 = db.connect();
+                        var token = await conn2.QueryFirstOrDefaultAsync<string>("SELECT u.FCM_Token FROM Tiket t JOIN Siswa s ON s.Id = t.Id_Siswa JOIN User u ON u.Id = s.Id_User WHERE t.Id = @Id", new { Id = Id_Tiket });
+                        if (!string.IsNullOrWhiteSpace(token))
+                        {
+                            await fcm.SendNotificationAsync(token, "Tiket Disetujui", "Guru BK telah menyetujui tiket Anda", new Dictionary<string, string>
+                            {
+                                { "type", "TIKET_STATUS" },
+                                { "ticketId", Id_Tiket.ToString() },
+                                { "status", "DISSETUJUI" }
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error sending tiket status notification: " + ex.Message);
+                    }
+                });
+
+                return true;
+            }
+
+            return false;
         }
 
         public async Task<bool> BKEditLokasi(int Id_Tiket, TiketUpdate data)
@@ -276,7 +304,35 @@ namespace BKNova.Services
             using var conn = db.connect();
             string sql = "UPDATE Tiket SET Id_Status=3, Tempat=@Tempat, Tanggal_Perjanjian=@Tanggal WHERE Id=@Id";
             var res = await conn.ExecuteAsync(sql, new { Id = Id_Tiket, data.Tempat, Tanggal = data.TanggalPerjanjian });
-            return res > 0;
+
+            if (res > 0)
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        using var conn2 = db.connect();
+                        var token = await conn2.QueryFirstOrDefaultAsync<string>("SELECT u.FCM_Token FROM Tiket t JOIN Siswa s ON s.Id = t.Id_Siswa JOIN User u ON u.Id = s.Id_User WHERE t.Id = @Id", new { Id = Id_Tiket });
+                        if (!string.IsNullOrWhiteSpace(token))
+                        {
+                            await fcm.SendNotificationAsync(token, "Tiket Ditunda", "Guru BK menunda tiket Anda", new Dictionary<string, string>
+                            {
+                                { "type", "TIKET_STATUS" },
+                                { "ticketId", Id_Tiket.ToString() },
+                                { "status", "DITUNDA" }
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error sending tiket status notification: " + ex.Message);
+                    }
+                });
+
+                return true;
+            }
+
+            return false;
         }
 
         public async Task<bool> BKBatalkan(int Id_Tiket)
@@ -284,7 +340,35 @@ namespace BKNova.Services
             using var conn = db.connect();
             string sql = "UPDATE Tiket SET Id_Status=4 WHERE Id=@Id";
             var res = await conn.ExecuteAsync(sql, new { Id = Id_Tiket });
-            return res > 0;
+
+            if (res > 0)
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        using var conn2 = db.connect();
+                        var token = await conn2.QueryFirstOrDefaultAsync<string>("SELECT u.FCM_Token FROM Tiket t JOIN Siswa s ON s.Id = t.Id_Siswa JOIN User u ON u.Id = s.Id_User WHERE t.Id = @Id", new { Id = Id_Tiket });
+                        if (!string.IsNullOrWhiteSpace(token))
+                        {
+                            await fcm.SendNotificationAsync(token, "Tiket Dibatalkan", "Guru BK membatalkan tiket Anda", new Dictionary<string, string>
+                            {
+                                { "type", "TIKET_STATUS" },
+                                { "ticketId", Id_Tiket.ToString() },
+                                { "status", "DIBATALKAN" }
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error sending tiket status notification: " + ex.Message);
+                    }
+                });
+
+                return true;
+            }
+
+            return false;
         }
 
         public async Task<bool> BKSelesai(int Id_Tiket)
@@ -292,7 +376,35 @@ namespace BKNova.Services
             using var conn = db.connect();
             string sql = "UPDATE Tiket SET Id_Status=5 WHERE Id=@Id";
             var res = await conn.ExecuteAsync(sql, new { Id = Id_Tiket });
-            return res > 0;
+
+            if (res > 0)
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        using var conn2 = db.connect();
+                        var token = await conn2.QueryFirstOrDefaultAsync<string>("SELECT u.FCM_Token FROM Tiket t JOIN Siswa s ON s.Id = t.Id_Siswa JOIN User u ON u.Id = s.Id_User WHERE t.Id = @Id", new { Id = Id_Tiket });
+                        if (!string.IsNullOrWhiteSpace(token))
+                        {
+                            await fcm.SendNotificationAsync(token, "Tiket Selesai", "Tiket konseling Anda telah selesai", new Dictionary<string, string>
+                            {
+                                { "type", "TIKET_STATUS" },
+                                { "ticketId", Id_Tiket.ToString() },
+                                { "status", "SELESAI" }
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error sending tiket status notification: " + ex.Message);
+                    }
+                });
+
+                return true;
+            }
+
+            return false;
         }
     }//Class
 }

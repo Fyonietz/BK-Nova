@@ -5,7 +5,10 @@ namespace BKNova.Models
     {
         public string Judul { get; set; } = string.Empty;
         public string Deskripsi { get; set; } = string.Empty;
-        public int Id_Kelas { get; set; }
+        // Backwards-compatible single-class field. If present, will be used when `KelasIds` is empty.
+        public int? Id_Kelas { get; set; }
+        // New: allow assigning kuesioner to multiple kelas IDs
+        public List<int> KelasIds { get; set; } = new();
         public int Id_Tahun_Ajaran { get; set; }
         public List<SoalKuesioner> Soal { get; set; } = new();
     }
