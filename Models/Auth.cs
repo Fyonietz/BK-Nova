@@ -67,6 +67,10 @@ namespace BKNova.Models
         public string Old_Password { get; set; } = string.Empty;
         public string New_Password { get; set; } = string.Empty;
     }
+    public class FcmTokenRequest
+    {
+        public string FcmToken { get; set; } = string.Empty;
+    }
     public static class Policies
     {
         public const string Admin = "Admin";

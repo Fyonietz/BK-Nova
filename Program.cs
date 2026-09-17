@@ -46,6 +46,8 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<Database>();
+// Firebase Cloud Messaging service
+builder.Services.AddSingleton<FcmService>();
 
 // ─────────────────────────────────────────────
 // 2. AUTHENTICATION (JWT)

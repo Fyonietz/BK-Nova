@@ -9,7 +9,8 @@ namespace BKNova.Services
     {
 
         private readonly Database db;
-        public TiketServices(Database _db) => db = _db;
+        private readonly FcmService fcm;
+        public TiketServices(Database _db, FcmService fcmService) { db = _db; fcm = fcmService; }
 
 
         //Ajukan Tiket Ambil Id_User dari path /me atau Account di Android
@@ -51,7 +52,37 @@ namespace BKNova.Services
                 Id_Status = 1
             });
 
-            return res > 0;
+            if (res > 0)
+            {
+                // get last insert id
+                var newId = await conn.ExecuteScalarAsync<int>("SELECT LAST_INSERT_ID();");
+
+                // try get BK's FCM token
+                try
+                {
+                    var token = await conn.QueryFirstOrDefaultAsync<string>("SELECT FCM_Token FROM User WHERE Id = @Id", new { Id = GetIdentity.Id_BK });
+                    if (!string.IsNullOrWhiteSpace(token))
+                    {
+                        // send notification (fire and forget)
+                        _ = Task.Run(async () =>
+                        {
+                            await fcm.SendNotificationAsync(token, "Tiket Konseling Baru", data.Judul ?? "Anda menerima tiket baru", new Dictionary<string, string>
+                            {
+                                { "type", "TIKET_BARU" },
+                                { "ticketId", newId.ToString() }
+                            });
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error sending tiket notification: " + ex.Message);
+                }
+
+                return true;
+            }
+
+            return false;
         }
 
         public async Task<List<TiketSiswaDTO>> SiswaGet(int Id_User)

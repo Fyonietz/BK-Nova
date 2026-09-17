@@ -161,6 +161,20 @@ namespace BKNova.Controllers
                 }
             }).RequireAuthorization();
 
+            g.MapPut("/fcm-token", async (AuthServices services, ClaimsPrincipal user, FcmTokenRequest req) =>
+            {
+                try
+                {
+                    var userId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+                    await services.UpdateFcmToken(userId, req.FcmToken);
+                    return Results.Ok();
+                }
+                catch (Exception e)
+                {
+                    return Results.InternalServerError(e.Message);
+                }
+            }).RequireAuthorization();
+
         }
     }
 }

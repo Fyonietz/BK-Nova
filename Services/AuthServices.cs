@@ -48,6 +48,12 @@ namespace BKNova.Services
             var sql = @"UPDATE User SET Refresh_Token = @RefreshToken,Refresh_Token_Expired=@Expired WHERE Id=@user_id";
             await conn.ExecuteAsync(sql, new { RefreshToken = RefreshToken, Expired = Expired, user_id = user_id });
         }
+
+        public async Task UpdateFcmToken(int user_id, string fcmToken)
+        {
+            using var conn = db.connect();
+            await conn.ExecuteAsync("UPDATE User SET FCM_Token = @Token WHERE Id = @Id", new { Token = fcmToken, Id = user_id });
+        }
         public async Task<User?> RefreshTokenService(RefreshRequest req)
         {
             using var conn = db.connect();

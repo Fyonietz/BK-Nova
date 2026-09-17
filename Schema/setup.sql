@@ -16,12 +16,16 @@ CREATE TABLE IF NOT EXISTS User(
   Password VARCHAR(255) NOT NULL,
   Refresh_Token VARCHAR(255) DEFAULT NULL,
   Refresh_Token_Expired TIMESTAMP NULL DEFAULT NULL,
+  FCM_Token TEXT DEFAULT NULL,
   Is_Active tinyint(1) DEFAULT 1,
   Created_At TIMESTAMP NULL DEFAULT current_timestamp(),
   Updated_At TIMESTAMP NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
 
   CONSTRAINT `fk_user_role` FOREIGN KEY(Id_Role) REFERENCES Roles(Id)
 );
+
+-- Add FCM token column for push notifications
+ALTER TABLE User ADD COLUMN IF NOT EXISTS FCM_Token TEXT DEFAULT NULL;
 
 ---Class Master---
 CREATE TABLE IF NOT EXISTS Tahun_Ajaran(

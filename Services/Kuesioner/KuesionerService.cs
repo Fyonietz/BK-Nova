@@ -6,7 +6,8 @@ namespace BKNova.Services
     public class KuesionerServices
     {
         private readonly Database db;
-        public KuesionerServices(Database _db) => db = _db;
+        private readonly FcmService fcm;
+        public KuesionerServices(Database _db, FcmService fcmService) { db = _db; fcm = fcmService; }
 
         // BK - Buat Kuesioner + Soal + Opsi
         public async Task<bool> BuatKuesioner(int Id_User_BK, Kuesioner data)
@@ -58,6 +59,30 @@ namespace BKNova.Services
                 }
 
                 await tx.CommitAsync();
+
+                // notify students in the class (non-blocking)
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        using var conn2 = db.connect();
+                        string sqlTokens = @"SELECT u.FCM_Token FROM Siswa s JOIN User u ON u.Id = s.Id_User WHERE s.Id_Kelas = @Kelas";
+                        var tokens = (await conn2.QueryAsync<string>(sqlTokens, new { Kelas = data.Id_Kelas })).Where(t => !string.IsNullOrWhiteSpace(t)).Distinct();
+                        foreach (var token in tokens)
+                        {
+                            await fcm.SendNotificationAsync(token, "Kuesioner Baru", data.Judul ?? "Ada kuesioner baru", new Dictionary<string, string>
+                            {
+                                { "type", "KUESIONER_BARU" },
+                                { "kuesionerId", Id_Kuesioner.ToString() }
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error sending kuesioner notifications: " + ex.Message);
+                    }
+                });
+
                 return true;
             }
             catch (Exception ex)

@@ -42,8 +42,7 @@ namespace BKNova.Controllers
                     if (res == null) return Results.NotFound(new { message = "Belum ada hasil AUM" });
                     return Results.Ok(res);
                 }
-                catch (Exception e) { return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message); }
-            }).RequireAuthorization(Policies.BK);
+                catch (Exception e) { return Results.Problem(title: "Internal Server Error", statusCode: 500, detail: e.Message); } }).RequireAuthorization(Policies.BK);
             g.MapGet("/status/{idUser:int}", async (AumServices services, int idUser) =>
            {
                try { return Results.Ok(new { submitted = await services.HasSubmitted(idUser) }); }
