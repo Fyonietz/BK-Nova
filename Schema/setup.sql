@@ -28,7 +28,7 @@ CREATE TABLE `Bidang_Masalah` (
   `Kode` varchar(255) NOT NULL,
   `Nama` varchar(255) NOT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -51,7 +51,7 @@ CREATE TABLE `Hasil_AUM` (
   CONSTRAINT `fk_Hasil_Siswa` FOREIGN KEY (`Id_Siswa`) REFERENCES `Siswa` (`Id`) ON DELETE SET NULL,
   CONSTRAINT `fk_Hasil_SoalMasalah` FOREIGN KEY (`Id_Soal_Masalah`) REFERENCES `Soal_Masalah` (`Id`) ON DELETE SET NULL,
   CONSTRAINT `fk_Hasil_TahunAjaran` FOREIGN KEY (`Id_Tahun_Ajaran`) REFERENCES `Tahun_Ajaran` (`Id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -75,7 +75,7 @@ CREATE TABLE `Jawaban_Kuesioner` (
   CONSTRAINT `fk_Jawaban_Opsi` FOREIGN KEY (`Id_Opsi`) REFERENCES `Opsi_Jawaban` (`Id`),
   CONSTRAINT `fk_Jawaban_Siswa` FOREIGN KEY (`Id_Siswa`) REFERENCES `Siswa` (`Id`),
   CONSTRAINT `fk_Jawaban_Soal` FOREIGN KEY (`Id_Soal`) REFERENCES `Soal_Kuesioner` (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -92,7 +92,7 @@ CREATE TABLE `Jurusan` (
   PRIMARY KEY (`Id`),
   UNIQUE KEY `Nama` (`Nama`),
   UNIQUE KEY `Kode` (`Kode`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -110,7 +110,7 @@ CREATE TABLE `Kelas` (
   PRIMARY KEY (`Id`),
   KEY `fk_Kelas_Jurusan` (`Id_Jurusan`),
   CONSTRAINT `fk_Kelas_Jurusan` FOREIGN KEY (`Id_Jurusan`) REFERENCES `Jurusan` (`Id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -135,7 +135,7 @@ CREATE TABLE `Kuesioner` (
   CONSTRAINT `fk_Kuesioner_BK` FOREIGN KEY (`Id_User_BK`) REFERENCES `User` (`Id`),
   CONSTRAINT `fk_Kuesioner_Kelas` FOREIGN KEY (`Id_Kelas`) REFERENCES `Kelas` (`Id`),
   CONSTRAINT `fk_Kuesioner_TahunAjaran` FOREIGN KEY (`Id_Tahun_Ajaran`) REFERENCES `Tahun_Ajaran` (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -154,7 +154,7 @@ CREATE TABLE `Kuesioner_Kelas` (
   KEY `fk_KuesionerKelas_Kelas` (`Id_Kelas`),
   CONSTRAINT `fk_KuesionerKelas_Kelas` FOREIGN KEY (`Id_Kelas`) REFERENCES `Kelas` (`Id`) ON DELETE CASCADE,
   CONSTRAINT `fk_KuesionerKuesioner` FOREIGN KEY (`Id_Kuesioner`) REFERENCES `Kuesioner` (`Id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -172,7 +172,7 @@ CREATE TABLE `Opsi_Jawaban` (
   PRIMARY KEY (`Id`),
   KEY `fk_Opsi_Soal` (`Id_Soal`),
   CONSTRAINT `fk_Opsi_Soal` FOREIGN KEY (`Id_Soal`) REFERENCES `Soal_Kuesioner` (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -226,7 +226,7 @@ CREATE TABLE `Roles` (
   `Nama` varchar(255) NOT NULL,
   PRIMARY KEY (`Id`),
   UNIQUE KEY `Nama` (`Nama`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -249,7 +249,7 @@ CREATE TABLE `Siswa` (
   KEY `fk_Siswa_Kelas` (`Id_Kelas`),
   CONSTRAINT `fk_Siswa_Kelas` FOREIGN KEY (`Id_Kelas`) REFERENCES `Kelas` (`Id`) ON DELETE SET NULL,
   CONSTRAINT `fk_Siswa_User` FOREIGN KEY (`Id_User`) REFERENCES `User` (`Id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -268,7 +268,7 @@ CREATE TABLE `Soal_Kuesioner` (
   PRIMARY KEY (`Id`),
   KEY `fk_Soal_Kuesioner` (`Id_Kuesioner`),
   CONSTRAINT `fk_Soal_Kuesioner` FOREIGN KEY (`Id_Kuesioner`) REFERENCES `Kuesioner` (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -285,7 +285,7 @@ CREATE TABLE `Soal_Masalah` (
   PRIMARY KEY (`Id`),
   KEY `fk_Soal_Bidang` (`Id_Bidang_Masalah`),
   CONSTRAINT `fk_Soal_Bidang` FOREIGN KEY (`Id_Bidang_Masalah`) REFERENCES `Bidang_Masalah` (`Id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=224 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -305,7 +305,7 @@ CREATE TABLE `Status_Submit_AUM` (
   KEY `fk_Status_TahunAjaran` (`Id_Tahun_Ajaran`),
   CONSTRAINT `fk_Status_Siswa` FOREIGN KEY (`Id_Siswa`) REFERENCES `Siswa` (`Id`) ON DELETE SET NULL,
   CONSTRAINT `fk_Status_TahunAjaran` FOREIGN KEY (`Id_Tahun_Ajaran`) REFERENCES `Tahun_Ajaran` (`Id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -325,7 +325,7 @@ CREATE TABLE `Status_Submit_Kuesioner` (
   KEY `fk_Submit_Kuesioner` (`Id_Kuesioner`),
   CONSTRAINT `fk_Submit_Kuesioner` FOREIGN KEY (`Id_Kuesioner`) REFERENCES `Kuesioner` (`Id`),
   CONSTRAINT `fk_Submit_Siswa` FOREIGN KEY (`Id_Siswa`) REFERENCES `Siswa` (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -339,7 +339,7 @@ CREATE TABLE `Status_Tiket` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `Nama` varchar(255) NOT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -356,7 +356,7 @@ CREATE TABLE `Tahun_Ajaran` (
   `Is_Active` tinyint(1) DEFAULT 0,
   PRIMARY KEY (`Id`),
   UNIQUE KEY `uq_tahun_semester` (`Nama`,`Semester`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -383,7 +383,7 @@ CREATE TABLE `Tiket` (
   CONSTRAINT `fk_Tiket_BK` FOREIGN KEY (`Id_BK`) REFERENCES `User` (`Id`) ON DELETE SET NULL,
   CONSTRAINT `fk_Tiket_Siswa` FOREIGN KEY (`Id_Siswa`) REFERENCES `Siswa` (`Id`) ON DELETE SET NULL,
   CONSTRAINT `fk_Tiket_Status` FOREIGN KEY (`Id_Status`) REFERENCES `Status_Tiket` (`Id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -407,7 +407,7 @@ CREATE TABLE `Tugas_BK` (
   CONSTRAINT `fk_Tugas_Kelas` FOREIGN KEY (`Id_Kelas`) REFERENCES `Kelas` (`Id`) ON DELETE SET NULL,
   CONSTRAINT `fk_Tugas_TahunAjaran` FOREIGN KEY (`Id_Tahun_Ajaran`) REFERENCES `Tahun_Ajaran` (`Id`) ON DELETE SET NULL,
   CONSTRAINT `fk_Tugas_User` FOREIGN KEY (`Id_User_BK`) REFERENCES `User` (`Id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -431,7 +431,7 @@ CREATE TABLE `User` (
   PRIMARY KEY (`Id`),
   KEY `fk_user_role` (`Id_Role`),
   CONSTRAINT `fk_user_role` FOREIGN KEY (`Id_Role`) REFERENCES `Roles` (`Id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
