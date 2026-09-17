@@ -1,3 +1,8 @@
+ -- Seed Roles
+INSERT INTO Roles(Nama) VALUES('Admin'),('Guru BK'),('Wali Kelas'),('Siswa');
+
+-- Seed Status Tiket
+INSERT INTO Status_Tiket(Nama) VALUES ('Dikirim'),('Disetujui'),('Ditunda'),('Dibatalkan'),('Selesai');
  -- Seed Bidang_Masalah
 INSERT INTO Bidang_Masalah (Kode, Nama) VALUES ('JDK', 'Jasmani dan kesehatan');
 INSERT INTO Bidang_Masalah (Kode, Nama) VALUES ('DPI', 'Diri Pribadi');
