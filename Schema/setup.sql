@@ -1,13 +1,14 @@
-CREATE DATABASE IF NOT EXISTS `bk_nova` CHARACTER SET utf8mb4 COLLATE  utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS `bk_nova` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `bk_nova`;
 
-USE bk_booster;
----Accountibilty---
+-- Accountability
 CREATE TABLE IF NOT EXISTS Roles(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Nama VARCHAR(255) NOT NULL UNIQUE
 );
 
-INSERT INTO Roles(Nama) VALUES('Admin'),('Guru BK'),('Wali Kelas'),('Siswa');
+INSERT INTO Roles(Nama) VALUES('Admin'),('Guru BK'),('Wali Kelas'),('Siswa')
+ON DUPLICATE KEY UPDATE Nama=VALUES(Nama);
 
 CREATE TABLE IF NOT EXISTS User(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -24,10 +25,7 @@ CREATE TABLE IF NOT EXISTS User(
   CONSTRAINT `fk_user_role` FOREIGN KEY(Id_Role) REFERENCES Roles(Id)
 );
 
--- Add FCM token column for push notifications
-ALTER TABLE User ADD COLUMN IF NOT EXISTS FCM_Token TEXT DEFAULT NULL;
-
----Class Master---
+-- Class Master
 CREATE TABLE IF NOT EXISTS Tahun_Ajaran(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Nama VARCHAR(255) NOT NULL,
@@ -42,7 +40,7 @@ CREATE TABLE IF NOT EXISTS Jurusan(
   Nama VARCHAR(255) NOT NULL UNIQUE,
   Kode VARCHAR(255) NOT NULL UNIQUE
 );
- 
+
 CREATE TABLE IF NOT EXISTS Kelas(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Nama VARCHAR(255) NOT NULL,
@@ -50,18 +48,17 @@ CREATE TABLE IF NOT EXISTS Kelas(
   CONSTRAINT fk_Kelas_Jurusan FOREIGN KEY(Id_Jurusan) REFERENCES Jurusan(Id) ON DELETE SET NULL
 );
 
-
---Dynamics And Profil--
+-- Dynamics And Profil
 CREATE TABLE IF NOT EXISTS Siswa(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Id_User INT,
   NISN VARCHAR(255) DEFAULT NULL,
   NIS VARCHAR(255) DEFAULT NULL,
   Jenis_Kelamin enum("Laki-Laki","Perempuan") NOT NULL,
-  Tempat_Tanggal_Lahir VARCHAR(255) NOT NULL
+  Tempat_Tanggal_Lahir VARCHAR(255) NOT NULL,
   CONSTRAINT fk_Siswa_User FOREIGN KEY (ID_User)
   REFERENCES User(Id) ON DELETE SET NULL
-) 
+);
 
 CREATE TABLE IF NOT EXISTS Wali_Kelas(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -77,15 +74,14 @@ CREATE TABLE IF NOT EXISTS Wali_Kelas(
   
   CONSTRAINT fk_Wali_Kelas_Tahun_Ajaran FOREIGN KEY(Id_Tahun_Ajaran)
   REFERENCES Tahun_Ajaran(Id) ON DELETE SET NULL
-)
+);
 
- 
 CREATE TABLE IF NOT EXISTS Riwayat_Kelas_Siswa(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Id_Siswa INT,
   Id_Kelas INT,
   Id_Tahun_Ajaran INT,
-  Is_Active tinyint(1) DEFAULT 1
+  Is_Active tinyint(1) DEFAULT 1,
 
   CONSTRAINT fk_Riwayat_Kelas_Siswa FOREIGN KEY(Id_Siswa)
   REFERENCES Siswa(Id) ON DELETE SET NULL,
@@ -93,21 +89,17 @@ CREATE TABLE IF NOT EXISTS Riwayat_Kelas_Siswa(
   CONSTRAINT fk_Riwayat_Kelas_Kelas FOREIGN KEY(Id_Kelas)
   REFERENCES Kelas(Id) ON DELETE SET NULL,
 
-  CONSTRAINT fk_Riwayat_Kelas_Kelas FOREIGN KEY(Id_Tahun_Ajaran)
-  REFERENCES Tahun_Ajaran(Id) ON DELETE SET NULL,
+  CONSTRAINT fk_Riwayat_Kelas_TahunAjaran FOREIGN KEY(Id_Tahun_Ajaran)
+  REFERENCES Tahun_Ajaran(Id) ON DELETE SET NULL
+);
 
-)
-
-
-
-
-//AUM
+-- AUM
 CREATE TABLE IF NOT EXISTS Bidang_Masalah(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Kode VARCHAR(255) NOT NULL,
   Nama VARCHAR(255) NOT NULL 
-)
- 
+);
+
 CREATE TABLE IF NOT EXISTS Soal_Masalah(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Id_Bidang_Masalah INT,
@@ -115,21 +107,20 @@ CREATE TABLE IF NOT EXISTS Soal_Masalah(
   
   CONSTRAINT fk_Soal_Bidang FOREIGN KEY(Id_Bidang_Masalah)
   REFERENCES Bidang_Masalah(Id)
-)
+);
 
 CREATE TABLE IF NOT EXISTS Status_Submit_AUM(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Id_Siswa INT,
   Id_Tahun_Ajaran INT,
   Submitted_At TIMESTAMP NULL DEFAULT current_timestamp(),
-                              
+  
   CONSTRAINT fk_Status_Siswa FOREIGN KEY(Id_Siswa)
   REFERENCES Siswa(Id),
 
   CONSTRAINT fk_Status_TahunAjaran FOREIGN KEY(Id_Tahun_Ajaran)
   REFERENCES Tahun_Ajaran(Id)
-)
-
+);
 
 CREATE TABLE IF NOT EXISTS Hasil_AUM(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -137,7 +128,7 @@ CREATE TABLE IF NOT EXISTS Hasil_AUM(
   Id_Soal_Masalah INT,
   Id_Tahun_Ajaran INT,
   Creted_At TIMESTAMP NULL DEFAULT current_timestamp(),
-                              
+  
   CONSTRAINT fk_Hasil_Siswa FOREIGN KEY(Id_Siswa)
   REFERENCES Siswa(Id),
 
@@ -146,7 +137,7 @@ CREATE TABLE IF NOT EXISTS Hasil_AUM(
 
   CONSTRAINT fk_Hasil_TahunAjaran FOREIGN KEY(Id_Tahun_Ajaran)
   REFERENCES Tahun_Ajaran(Id)
-)
+);
 
 CREATE TABLE IF NOT EXISTS Tugas_BK(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -156,7 +147,6 @@ CREATE TABLE IF NOT EXISTS Tugas_BK(
   Assigned_At TIMESTAMP NULL DEFAULT current_timestamp(),
   Is_Active tinyint(1) DEFAULT 1,
 
-
   CONSTRAINT fk_Tugas_User FOREIGN KEY(Id_User_BK)
   REFERENCES User(Id),
   
@@ -164,22 +154,24 @@ CREATE TABLE IF NOT EXISTS Tugas_BK(
   REFERENCES Kelas(Id),
 
   CONSTRAINT fk_Tugas_TahunAjaran FOREIGN KEY(Id_Tahun_Ajaran)
-  REFERENCES Tahun_Ajaran(Id),
-)
+  REFERENCES Tahun_Ajaran(Id)
+);
 
-
-//Tiket 
+-- Tiket 
 CREATE TABLE IF NOT EXISTS Status_Tiket(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Nama VARCHAR(255) NOT NULL
-)
-INSERT INTO Status_Tiket(Nama) VALUES ('Dikirim'),('Disetujui'),('Ditunda'),('Dibatalkan'),('Selesai');
+);
+
+INSERT INTO Status_Tiket(Nama) VALUES ('Dikirim'),('Disetujui'),('Ditunda'),('Dibatalkan'),('Selesai')
+ON DUPLICATE KEY UPDATE Nama=VALUES(Nama);
+
 CREATE TABLE IF NOT EXISTS Tiket(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Id_Siswa INT,
   Id_BK INT,
   Judul VARCHAR(255) NOT NULL,
-  Isi TEXT  NOT NULL,
+  Isi TEXT NOT NULL,
   Tanggal_Pembuatan TIMESTAMP NULL DEFAULT current_timestamp(),
   Tanggal_Perjanjian DATETIME NULL DEFAULT NULL,
   Id_Status INT,
@@ -188,13 +180,12 @@ CREATE TABLE IF NOT EXISTS Tiket(
   CONSTRAINT fk_Tiket_Siswa FOREIGN KEY(Id_Siswa)
   REFERENCES Siswa(Id),
 
-  
   CONSTRAINT fk_Tiket_BK FOREIGN KEY(Id_BK)
   REFERENCES User(Id),
 
   CONSTRAINT fk_Tiket_Status FOREIGN KEY(Id_Status)
   REFERENCES Status_Tiket(Id)
-)
+);
 
 CREATE TABLE IF NOT EXISTS Riwayat_Tiket(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -202,9 +193,9 @@ CREATE TABLE IF NOT EXISTS Riwayat_Tiket(
 
   CONSTRAINT fk_Riwayat_Tiket FOREIGN KEY(Id_Tiket)
   REFERENCES Tiket(Id)
-)
+);
 
- CREATE TABLE IF NOT EXISTS Kuesioner(
+CREATE TABLE IF NOT EXISTS Kuesioner(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Id_User_BK INT,
   Id_Kelas INT,
@@ -223,7 +214,6 @@ CREATE TABLE IF NOT EXISTS Riwayat_Tiket(
   REFERENCES Tahun_Ajaran(Id)
 );
 
--- Mapping table to allow a kuesioner to be assigned to multiple classes
 CREATE TABLE IF NOT EXISTS Kuesioner_Kelas(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Id_Kuesioner INT NOT NULL,
@@ -231,9 +221,6 @@ CREATE TABLE IF NOT EXISTS Kuesioner_Kelas(
   CONSTRAINT fk_KuesionerKuesioner FOREIGN KEY(Id_Kuesioner) REFERENCES Kuesioner(Id) ON DELETE CASCADE,
   CONSTRAINT fk_KuesionerKelas_Kelas FOREIGN KEY(Id_Kelas) REFERENCES Kelas(Id) ON DELETE CASCADE
 );
-
--- Backfill note: After deploying, you may want to populate Kuesioner_Kelas
--- from existing Kuesioner.Id_Kelas values for backward compatibility.
 
 CREATE TABLE IF NOT EXISTS Soal_Kuesioner(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -260,8 +247,8 @@ CREATE TABLE IF NOT EXISTS Jawaban_Kuesioner(
   Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   Id_Siswa INT,
   Id_Soal INT,
-  Id_Opsi INT NULL,        -- untuk PG
-  Teks_Jawaban TEXT NULL,  -- untuk Esai
+  Id_Opsi INT NULL,
+  Teks_Jawaban TEXT NULL,
   Answered_At TIMESTAMP NULL DEFAULT current_timestamp(),
 
   CONSTRAINT fk_Jawaban_Siswa FOREIGN KEY(Id_Siswa)
