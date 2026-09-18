@@ -198,5 +198,13 @@ namespace BKNova.Services
             var res = await conn.QueryAsync<JawabanSiswaDTO>(sql, new { Kuesioner = Id_Kuesioner, Siswa = Id_Siswa });
             return res.ToList();
         }
+        // BK - Hapus Kuesioner
+        public async Task<bool> HapusKuesioner(int Id_Kuesioner, int Id_User_BK)
+        {
+            using var conn = db.connect();
+            string sql = @"DELETE FROM Kuesioner WHERE Id = @Id AND Id_User_BK = @BK";
+            int affected = await conn.ExecuteAsync(sql, new { Id = Id_Kuesioner, BK = Id_User_BK });
+            return affected > 0;
+        }
     }
 }

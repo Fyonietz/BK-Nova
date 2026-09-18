@@ -179,7 +179,7 @@ app.Use(async (context, next) =>
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapGet("/",()=>{
+app.MapGet("/api/v1/health",()=>{
     return Results.Ok("Server Running");
 });
 // ─────────────────────────────────────────────

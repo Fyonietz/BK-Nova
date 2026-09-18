@@ -1,0 +1,22 @@
+ SET FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE TABLE `Riwayat_Tiket`;
+TRUNCATE TABLE `Jawaban_Kuesioner`;
+TRUNCATE TABLE `Status_Submit_Kuesioner`;
+TRUNCATE TABLE `Status_Submit_AUM`;
+TRUNCATE TABLE `Hasil_AUM`;
+TRUNCATE TABLE `Kuesioner_Kelas`;
+TRUNCATE TABLE `Soal_Kuesioner`;
+TRUNCATE TABLE `Opsi_Jawaban`;
+TRUNCATE TABLE `Kuesioner`;
+TRUNCATE TABLE `Tiket`;
+TRUNCATE TABLE `Tugas_BK`;
+TRUNCATE TABLE `Wali_Kelas`;
+TRUNCATE TABLE `Riwayat_Kelas_Siswa`;
+TRUNCATE TABLE `Siswa`;
+TRUNCATE TABLE `Kelas`;
+TRUNCATE TABLE `Jurusan`;
+TRUNCATE TABLE `Tahun_Ajaran`;
+TRUNCATE TABLE `User`;
+
+SET FOREIGN_KEY_CHECKS = 1;

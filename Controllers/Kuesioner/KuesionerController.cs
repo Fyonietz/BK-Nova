@@ -26,7 +26,15 @@ namespace BKNova.Controllers
                 }
             });
             // .RequireAuthorization(Policies.BK);
+            g.MapDelete("/kuesioner/{idBk}/{idKuesioner}",async (KuesionerServices services,int idBk,int idKuesioner)=>{
 
+                try
+                {
+                    await services.HapusKuesioner(idBk,idKuesioner);
+                    return Results.Ok();
+                }
+                catch (Exception e) { return Results.InternalServerError(e.Message); }
+            }).RequireAuthorization(Policies.BK);
             g.MapGet("/bk/{IdUser}", async (KuesionerServices services, int IdUser) =>
             {
                 try
